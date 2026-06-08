@@ -1,0 +1,415 @@
+// ClubSync — Full Prisma Schema v1
+// Run: npx prisma migrate dev --name init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─────────────────────────────────────────────
+// ENUMS
+// ─────────────────────────────────────────────
+
+enum UserRole {
+  STUDENT
+  CLUB_MEMBER
+  CLUB_ADMIN
+  CLUB_OWNER
+  COLLEGE_ADMIN
+  SUPER_ADMIN
+}
+
+enum ClubCategory {
+  TECH
+  CULTURAL
+  SPORTS
+  SOCIAL
+  ACADEMIC
+  ARTS
+  OTHER
+}
+
+enum ClubStatus {
+  PENDING
+  APPROVED
+  SUSPENDED
+  REJECTED
+}
+
+enum ClubMemberRole {
+  FOLLOWER
+  MEMBER
+  ADMIN
+  OWNER
+}
+
+enum EventType {
+  IN_PERSON
+  ONLINE
+  HYBRID
+}
+
+enum EventStatus {
+  DRAFT
+  PUBLISHED
+  CANCELLED
+  COMPLETED
+}
+
+enum RegistrationStatus {
+  CONFIRMED
+  WAITLISTED
+  CANCELLED
+  ATTENDED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum NotificationType {
+  EVENT_REGISTRATION
+  EVENT_REMINDER
+  EVENT_UPDATE
+  EVENT_CANCELLED
+  CLUB_ANNOUNCEMENT
+  CLUB_INVITE
+  CHECK_IN_OPEN
+  CERTIFICATE_READY
+  WAITLIST_PROMOTED
+  SYSTEM
+}
+
+// ─────────────────────────────────────────────
+// CORE ENTITIES
+// ─────────────────────────────────────────────
+
+model College {
+  id        String   @id @default(cuid())
+  name      String
+  domain    String   @unique // e.g. "mit.edu" — email domain for SSO restriction
+  logo      String?
+  banner    String?
+  settings  Json     @default("{}")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users User[]
+  clubs Club[]
+
+  @@map("colleges")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  authId    String   @unique // better-auth user ID
+  email     String   @unique
+  name      String
+  avatar    String?
+  bio       String?
+  year      Int?     // Academic year (1-5)
+  interests String[] // Array of interest tags
+  role      UserRole @default(STUDENT)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  college   College? @relation(fields: [collegeId], references: [id])
+  collegeId String?
+
+  clubMemberships ClubMember[]
+  registrations   Registration[]
+  notifications   Notification[]
+  eventViews      EventView[]
+  certificates    Certificate[]
+  checkins        Checkin[]
+
+  @@index([email])
+  @@index([authId])
+  @@map("users")
+}
+
+// ─────────────────────────────────────────────
+// CLUBS
+// ─────────────────────────────────────────────
+
+model Club {
+  id          String       @id @default(cuid())
+  slug        String       @unique
+  name        String
+  tagline     String?
+  category    ClubCategory @default(OTHER)
+  bio         String?      @db.Text
+  logo        String?
+  banner      String?
+  website     String?
+  instagram   String?
+  twitter     String?
+  linkedin    String?
+  status      ClubStatus   @default(PENDING)
+  isVerified  Boolean      @default(false)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  college   College @relation(fields: [collegeId], references: [id])
+  collegeId String
+
+  members       ClubMember[]
+  events        Event[]
+  announcements Announcement[]
+  inviteLinks   InviteLink[]
+
+  @@index([slug])
+  @@index([collegeId])
+  @@map("clubs")
+}
+
+model ClubMember {
+  id       String         @id @default(cuid())
+  role     ClubMemberRole @default(FOLLOWER)
+  joinedAt DateTime       @default(now())
+
+  club   Club   @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  clubId String
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
+  @@unique([clubId, userId])
+  @@index([clubId])
+  @@index([userId])
+  @@map("club_members")
+}
+
+model InviteLink {
+  id        String    @id @default(cuid())
+  token     String    @unique @default(cuid())
+  role      ClubMemberRole @default(MEMBER)
+  maxUses   Int?
+  usedCount Int       @default(0)
+  expiresAt DateTime?
+  createdAt DateTime  @default(now())
+
+  club   Club   @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  clubId String
+
+  @@index([token])
+  @@map("invite_links")
+}
+
+// ─────────────────────────────────────────────
+// EVENTS
+// ─────────────────────────────────────────────
+
+model Event {
+  id              String      @id @default(cuid())
+  title           String
+  slug            String      @unique
+  description     String      @db.Text
+  type            EventType   @default(IN_PERSON)
+  status          EventStatus @default(DRAFT)
+  coverImage      String?
+  startAt         DateTime
+  endAt           DateTime
+  venue           String?     // Physical venue or "Online"
+  meetingLink     String?     // For online/hybrid events
+  capacity        Int?
+  tags            String[]
+  category        ClubCategory?
+  faqs            Json        @default("[]")   // [{q, a}]
+  speakers        Json        @default("[]")   // [{name, bio, photo}]
+  publishAt       DateTime?   // Scheduled publish time
+  checkinOpensAt  DateTime?   // When check-in opens (auto = startAt - X minutes)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  club      Club   @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  clubId    String
+
+  createdBy   User   @relation(fields: [createdById], references: [id])
+  createdById String
+
+  ticketTiers   TicketTier[]
+  registrations Registration[]
+  eventViews    EventView[]
+  checkins      Checkin[]
+
+  @@index([clubId])
+  @@index([status])
+  @@index([startAt])
+  @@map("events")
+}
+
+model TicketTier {
+  id          String    @id @default(cuid())
+  name        String    // "Free", "VIP", "Early Bird"
+  description String?
+  price       Float     @default(0) // 0 = free
+  capacity    Int?
+  available   Int?      // Remaining spots (decremented on registration)
+  closesAt    DateTime? // Registration deadline for this tier
+  createdAt   DateTime  @default(now())
+
+  event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  eventId String
+
+  registrations Registration[]
+
+  @@index([eventId])
+  @@map("ticket_tiers")
+}
+
+// ─────────────────────────────────────────────
+// REGISTRATIONS & TICKETING
+// ─────────────────────────────────────────────
+
+model Registration {
+  id           String             @id @default(cuid())
+  status       RegistrationStatus @default(CONFIRMED)
+  qrToken      String             @unique @default(cuid())
+  customFields Json               @default("{}")
+  registeredAt DateTime           @default(now())
+  cancelledAt  DateTime?
+
+  event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  eventId String
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  tier   TicketTier? @relation(fields: [tierId], references: [id])
+  tierId String?
+
+  payment     Payment?
+  checkin     Checkin?
+  certificate Certificate?
+
+  @@unique([eventId, userId])
+  @@index([qrToken])
+  @@index([userId])
+  @@index([eventId])
+  @@map("registrations")
+}
+
+// ─────────────────────────────────────────────
+// CHECK-IN
+// ─────────────────────────────────────────────
+
+model Checkin {
+  id           String   @id @default(cuid())
+  checkedInAt  DateTime @default(now())
+  method       String   @default("QR") // "QR" | "MANUAL"
+
+  registration   Registration @relation(fields: [registrationId], references: [id])
+  registrationId String       @unique
+
+  event   Event  @relation(fields: [eventId], references: [id])
+  eventId String
+
+  checkedInBy   User   @relation(fields: [checkedInById], references: [id])
+  checkedInById String
+
+  @@index([eventId])
+  @@map("checkins")
+}
+
+// ─────────────────────────────────────────────
+// PAYMENTS
+// ─────────────────────────────────────────────
+
+model Payment {
+  id               String        @id @default(cuid())
+  amount           Float
+  currency         String        @default("INR")
+  status           PaymentStatus @default(PENDING)
+  razorpayOrderId  String?       @unique
+  razorpayPaymentId String?      @unique
+  paidAt           DateTime?
+  refundedAt       DateTime?
+  createdAt        DateTime      @default(now())
+
+  registration   Registration @relation(fields: [registrationId], references: [id])
+  registrationId String       @unique
+
+  @@map("payments")
+}
+
+// ─────────────────────────────────────────────
+// NOTIFICATIONS & ANNOUNCEMENTS
+// ─────────────────────────────────────────────
+
+model Notification {
+  id        String           @id @default(cuid())
+  type      NotificationType
+  title     String
+  body      String
+  data      Json             @default("{}")
+  read      Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
+  @@index([userId, read])
+  @@map("notifications")
+}
+
+model Announcement {
+  id        String   @id @default(cuid())
+  title     String
+  body      String   @db.Text
+  sentAt    DateTime @default(now())
+
+  club   Club   @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  clubId String
+
+  sentBy   User   @relation(fields: [sentById], references: [id])
+  sentById String
+
+  @@index([clubId])
+  @@map("announcements")
+}
+
+// ─────────────────────────────────────────────
+// CERTIFICATES
+// ─────────────────────────────────────────────
+
+model Certificate {
+  id          String   @id @default(cuid())
+  verifyToken String   @unique @default(cuid())
+  pdfUrl      String?
+  issuedAt    DateTime @default(now())
+
+  registration   Registration @relation(fields: [registrationId], references: [id])
+  registrationId String       @unique
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  @@map("certificates")
+}
+
+// ─────────────────────────────────────────────
+// DISCOVERY SIGNALS
+// ─────────────────────────────────────────────
+
+model EventView {
+  id       String   @id @default(cuid())
+  viewedAt DateTime @default(now())
+
+  event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  eventId String
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
+  @@index([userId])
+  @@index([eventId])
+  @@map("event_views")
+}
