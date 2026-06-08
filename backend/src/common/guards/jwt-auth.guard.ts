@@ -49,7 +49,9 @@ export class JwtAuthGuard implements CanActivate {
         throw new UnauthorizedException('User not found');
       }
 
-      request['user'] = user;
+      // Never expose password hash to controllers
+      const { passwordHash, ...safeUser } = user as any;
+      request['user'] = safeUser;
     } catch {
       throw new UnauthorizedException('Invalid or expired token');
     }

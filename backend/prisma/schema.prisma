@@ -117,6 +117,7 @@ model User {
   year      Int?     // Academic year (1-5)
   interests String[] // Array of interest tags
   role      UserRole @default(STUDENT)
+  passwordHash String?  // null for OAuth users
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -131,6 +132,7 @@ model User {
   checkins          Checkin[]
   createdEvents     Event[]
   sentAnnouncements Announcement[]
+  refreshTokens     RefreshToken[]
 
   @@index([email])
   @@index([authId])
@@ -414,4 +416,23 @@ model EventView {
   @@index([userId])
   @@index([eventId])
   @@map("event_views")
+}
+
+// ─────────────────────────────────────────────
+// AUTH — REFRESH TOKENS
+// ─────────────────────────────────────────────
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String   @unique  // stored as hash
+  isRevoked Boolean  @default(false)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
+  @@index([token])
+  @@index([userId])
+  @@map("refresh_tokens")
 }

@@ -109,3 +109,8 @@ export type Certificate = Prisma.CertificateModel
  * 
  */
 export type EventView = Prisma.EventViewModel
+/**
+ * Model RefreshToken
+ * 
+ */
+export type RefreshToken = Prisma.RefreshTokenModel

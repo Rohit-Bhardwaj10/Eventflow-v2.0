@@ -64,7 +64,8 @@ export const ModelName = {
   Notification: 'Notification',
   Announcement: 'Announcement',
   Certificate: 'Certificate',
-  EventView: 'EventView'
+  EventView: 'EventView',
+  RefreshToken: 'RefreshToken'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -107,6 +108,7 @@ export const UserScalarFieldEnum = {
   year: 'year',
   interests: 'interests',
   role: 'role',
+  passwordHash: 'passwordHash',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   collegeId: 'collegeId'
@@ -295,6 +297,18 @@ export const EventViewScalarFieldEnum = {
 } as const
 
 export type EventViewScalarFieldEnum = (typeof EventViewScalarFieldEnum)[keyof typeof EventViewScalarFieldEnum]
+
+
+export const RefreshTokenScalarFieldEnum = {
+  id: 'id',
+  token: 'token',
+  isRevoked: 'isRevoked',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt',
+  userId: 'userId'
+} as const
+
+export type RefreshTokenScalarFieldEnum = (typeof RefreshTokenScalarFieldEnum)[keyof typeof RefreshTokenScalarFieldEnum]
 
 
 export const SortOrder = {
