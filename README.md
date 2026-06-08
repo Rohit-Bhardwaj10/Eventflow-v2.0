@@ -44,6 +44,3 @@ npm install
 npm run dev
 ```
 
-## Documentation
-- Refer to `buildplan.md` for the comprehensive technical plan.
-- Refer to `progress.md` for current development status.
