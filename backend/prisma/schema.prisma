@@ -123,12 +123,14 @@ model User {
   college   College? @relation(fields: [collegeId], references: [id])
   collegeId String?
 
-  clubMemberships ClubMember[]
-  registrations   Registration[]
-  notifications   Notification[]
-  eventViews      EventView[]
-  certificates    Certificate[]
-  checkins        Checkin[]
+  clubMemberships   ClubMember[]
+  registrations     Registration[]
+  notifications     Notification[]
+  eventViews        EventView[]
+  certificates      Certificate[]
+  checkins          Checkin[]
+  createdEvents     Event[]
+  sentAnnouncements Announcement[]
 
   @@index([email])
   @@index([authId])
