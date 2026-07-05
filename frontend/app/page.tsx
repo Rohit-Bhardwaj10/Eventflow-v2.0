@@ -1,281 +1,524 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { PublicLayout } from "@/components/layouts/public-layout";
-import { motion } from "framer-motion";
+import Image from 'next/image';
+import Link from 'next/link';
+import { motion } from 'framer-motion';
 import {
-  Ticket,
-  ScanLine,
-  BarChart3,
-  Wand2,
-  Users,
-  ShieldCheck,
   ArrowRight,
-  Zap,
-  QrCode,
+  BarChart3,
+  BadgeCheck,
+  CalendarDays,
+  CheckCircle2,
+  CreditCard,
+  FileCheck2,
+  Megaphone,
+  MessageSquareQuote,
+  Radar,
+  ScanLine,
+  ShieldCheck,
   Sparkles,
-  Terminal
-} from "lucide-react";
+  Ticket,
+} from 'lucide-react';
+import type { ReactNode } from 'react';
+
+import { PublicLayout } from '@/components/layouts/public-layout';
+import { HeroScene } from '@/components/landing/hero-scene';
+
+const stats = [
+  { value: '3x', label: 'faster setup' },
+  { value: '99.9%', label: 'scan reliability' },
+  { value: '1', label: 'workspace' },
+];
 
 const features = [
   {
     icon: Ticket,
-    title: "Tiered Ticketing",
-    desc: "Cap capacity, waitlists, payments. Absolute control.",
-    color: "bg-accent-yellow",
-    text: "text-canvas"
+    title: 'Ticketing that stays tidy',
+    description:
+      'Create public or private ticket tiers, manage capacity, and keep the experience simple for attendees.',
   },
   {
     icon: ScanLine,
-    title: "Check-in",
-    desc: "Sub-second QR scanning. Chaos eliminated.",
-    color: "bg-accent-cyan",
-    text: "text-canvas"
-  },
-  {
-    icon: Wand2,
-    title: "AI Co-pilot",
-    desc: "Draft marketing copy in ms with Llama 3.",
-    color: "bg-accent-pink",
-    text: "text-canvas"
+    title: 'Fast QR check-in',
+    description:
+      'Move entry from a bottleneck to a quick scan with a clear live view for the team at the door.',
   },
   {
     icon: BarChart3,
-    title: "Deep Analytics",
-    desc: "Track everything. Trust only data.",
-    color: "bg-primary",
-    text: "text-canvas"
-  }
+    title: 'Operational analytics',
+    description:
+      'See registrations, attendance, and conversion in one dashboard instead of stitching reports together.',
+  },
+  {
+    icon: Megaphone,
+    title: 'Announcements and outreach',
+    description:
+      'Send updates, reminders, and follow-ups without leaving the event workflow.',
+  },
+  {
+    icon: FileCheck2,
+    title: 'Certificates and records',
+    description:
+      'Keep attendance records and post-event certificates attached to the same source of truth.',
+  },
+  {
+    icon: ShieldCheck,
+    title: 'Controlled access',
+    description:
+      'Separate organizers, volunteers, and admins so the right people see the right controls.',
+  },
 ];
+
+const workflow = [
+  {
+    step: '01',
+    title: 'Plan the event',
+    description:
+      'Set the event details, pricing, attendee limits, and communications from a single workspace.',
+    icon: CalendarDays,
+  },
+  {
+    step: '02',
+    title: 'Publish and collect',
+    description:
+      'Share the event, sell tickets, and track signups while the dashboard keeps the numbers current.',
+    icon: CreditCard,
+  },
+  {
+    step: '03',
+    title: 'Operate on the day',
+    description:
+      'Scan QR codes, monitor arrivals, and update the team without juggling separate tools.',
+    icon: Radar,
+  },
+];
+
+const showcase = [
+  {
+    image: '/dashboard-mockup.png',
+    title: 'Command center',
+    description:
+      'Keep registrations, check-ins, and attendance trends in one dense but readable view.',
+  },
+  {
+    image: '/event-ticket-mockup.png',
+    title: 'Ticket surfaces',
+    description:
+      'Present tickets with a clear identity and the exact details organizers need at entry.',
+  },
+  {
+    image: '/analytics-mockup.png',
+    title: 'Live performance',
+    description:
+      'Review event health, traffic, and conversions before and after the event closes.',
+  },
+];
+
+const testimonials = [
+  {
+    quote:
+      'We moved from spreadsheets and ad-hoc messages to a single flow the team could actually follow during live events.',
+    name: 'Aarav Mehta',
+    role: 'Cultural secretary, campus club',
+  },
+  {
+    quote:
+      'The interface is direct. It gives enough control for organizers without making the dashboard feel crowded.',
+    name: 'Sara Iyer',
+    role: 'Events lead, student council',
+  },
+  {
+    quote:
+      'Check-in became a two-person job instead of a fire drill. That alone changed how our launch day felt.',
+    name: 'Rohit Nair',
+    role: 'Operations volunteer',
+  },
+];
+
+const faq = [
+  {
+    q: 'Is Eventflow built for small teams?',
+    a: 'Yes. It is designed for student teams and club organizers who need a clean workflow without a large operations staff.',
+  },
+  {
+    q: 'Can we run public and private events?',
+    a: 'Yes. The same flow supports open registration, invite-based access, and controlled entry depending on the event.',
+  },
+  {
+    q: 'Do we get attendee analytics?',
+    a: 'Yes. The dashboard is focused on the metrics that matter most: registrations, attendance, and conversion.',
+  },
+  {
+    q: 'Does it support on-site check-in?',
+    a: 'Yes. QR-based check-in is part of the core flow and is surfaced as a fast, operational tool.',
+  },
+];
+
+const chipLogos = ['IIT Delhi', 'BITS Pilani', 'NIT Trichy', 'VIT', 'SRM'];
+const ease = [0.16, 1, 0.3, 1] as const;
 
 export default function LandingPage() {
   return (
     <PublicLayout>
-      <div className="brutal-noise-bg min-h-screen selection:bg-primary selection:text-canvas">
-        
-        {/* Aggressive Marquee Header */}
-        <div className="w-full overflow-hidden border-b-[3px] border-border bg-primary py-2 shadow-brutal">
-          <div className="flex whitespace-nowrap marquee-track font-mono font-black text-sm uppercase tracking-widest text-canvas">
-            {Array(15)
-              .fill("CAMPUS SCALE ONLY /// ")
-              .map((text, i) => (
-                <span key={i} className="mx-4">
-                  {text}
-                </span>
-              ))}
-          </div>
-        </div>
+      <div className="relative isolate overflow-hidden bg-canvas selection:bg-primary selection:text-ink">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(183,188,248,0.12),_transparent_36%),radial-gradient(circle_at_bottom_right,_rgba(73,128,115,0.1),_transparent_24%)]" />
+        <div className="pointer-events-none absolute inset-0 opacity-[0.06] [background-image:linear-gradient(rgba(244,244,240,0.2)_1px,transparent_1px),linear-gradient(90deg,rgba(244,244,240,0.2)_1px,transparent_1px)] [background-size:42px_42px]" />
 
-        {/* Hero Section */}
-        <section className="relative border-b-[4px] border-border bg-canvas pt-12 pb-24 lg:pt-24 lg:pb-32 overflow-hidden">
-          <div className="absolute inset-0 brutal-grid-bg pointer-events-none" />
-
-          <div className="max-w-[1400px] mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-10">
-            
-            {/* Left — High Impact Copy */}
-            <div className="lg:col-span-7 flex flex-col items-start">
-              
-              <div className="mb-6 inline-flex items-center bg-accent-pink text-canvas font-mono font-bold text-xs uppercase px-3 py-1 border-[3px] border-border shadow-[4px_4px_0_0_#f4f4f0] -rotate-2">
-                <Zap className="w-4 h-4 mr-2" />
-                V2.0 LIVE
-              </div>
-
-              <h1 className="text-display-xl text-ink leading-[0.85] mb-8">
-                <span className="block">OWN</span>
-                <span className="block text-outline-brutal">THE</span>
-                <span className="inline-block bg-primary text-canvas px-4 pb-2 pt-1 rotate-2 shadow-[8px_8px_0_0_#f4f4f0] border-[4px] border-border mt-3">
-                  DOOR.
-                </span>
-              </h1>
-
-              <p className="text-subhead text-ink max-w-lg mb-10 p-5 border-[3px] border-border border-l-[8px] border-l-accent-cyan bg-surface-1 shadow-brutal-lg">
-                Eventflow is the ruthless, all-in-one platform for college clubs.
-                Stop using spreadsheets. Start running real events.
-              </p>
-
-              <div className="flex flex-col sm:flex-row gap-6 w-full max-w-md">
-                <Link href="/signup" className="w-full">
-                  <button className="w-full bg-primary text-canvas text-lg font-black uppercase py-5 border-[3px] border-border brutal-hover-lift flex items-center justify-center group shadow-[6px_6px_0_0_#f4f4f0]">
-                    START FOR FREE
-                    <ArrowRight className="w-6 h-6 ml-3 group-hover:translate-x-2 transition-transform" />
-                  </button>
-                </Link>
-                <Link href="/explore" className="w-full">
-                  <button className="w-full bg-surface-1 text-ink text-lg font-black uppercase py-5 border-[3px] border-border brutal-hover-lift shadow-[6px_6px_0_0_#f4f4f0]">
-                    BROWSE
-                  </button>
-                </Link>
-              </div>
-            </div>
-
-            {/* Right — The Differentiation Anchor (Massive Ticket) */}
-            <div className="lg:col-span-5 hidden lg:block perspective-[1200px]">
+        <section className="relative pt-32 md:pt-36">
+          <div className="mx-auto max-w-6xl px-6 pb-16 lg:pb-20">
+            <div className="grid items-center gap-10 lg:grid-cols-[1.03fr_0.97fr]">
               <motion.div
-                className="w-full max-w-[380px] mx-auto animate-float-brutal relative"
-                initial={{ opacity: 0, rotateY: 30, scale: 0.9 }}
-                animate={{ opacity: 1, rotateY: -5, scale: 1 }}
-                transition={{ duration: 0.8, ease: "easeOut" }}
-                style={{ transformStyle: "preserve-3d" }}
+                initial={{ opacity: 0, y: 18 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.65, ease }}
+                className="max-w-2xl"
               >
-                <div className="bg-canvas border-[4px] border-border shadow-[16px_16px_0_0_#f4f4f0] relative">
-                  
-                  {/* Top Half */}
-                  <div className="p-8 bg-accent-pink border-b-[4px] border-border border-dashed relative h-[240px] flex flex-col justify-end">
-                    <div className="bg-diagonal-stripes absolute inset-0 opacity-20 pointer-events-none"></div>
-                    <div className="absolute -right-8 -top-8 opacity-10 rotate-12 text-canvas pointer-events-none">
-                      <QrCode className="w-56 h-56" />
-                    </div>
-                    <div className="self-start bg-canvas text-ink font-mono font-bold text-xs uppercase px-3 py-1 border-[2px] border-border mb-4 -rotate-2 shadow-brutal-sm relative z-10">
-                      VIP ACCESS
-                    </div>
-                    <h2 className="text-[56px] font-black text-canvas leading-[0.85] uppercase tracking-tighter relative z-10">
-                      TECH<br/>NEXUS<br/>2026
-                    </h2>
-                  </div>
-                  
-                  {/* Bottom Half */}
-                  <div className="p-8 bg-surface-1 flex justify-between items-end h-[160px]">
-                    <div>
-                      <p className="text-caption text-ink-muted mb-1">ATTENDEE</p>
-                      <p className="font-black text-2xl uppercase tracking-tight text-ink">ADMIT ONE</p>
-                    </div>
-                    <div className="bg-canvas p-2 border-[3px] border-border shadow-brutal-sm">
-                      <QrCode className="w-16 h-16 text-ink" />
-                    </div>
-                  </div>
+                <div className="inline-flex items-center gap-2 border-[2px] border-border bg-surface-1 px-3 py-2 text-[11px] font-black uppercase tracking-[0.24em] text-ink-muted shadow-brutal-sm">
+                  <Sparkles className="h-4 w-4 text-primary" />
+                  Campus event operations
                 </div>
-                
-                {/* Floating stat card */}
-                <div className="absolute -bottom-10 -left-12 bg-primary text-canvas border-[4px] border-border shadow-[8px_8px_0_0_#f4f4f0] p-5 -rotate-6 z-30 group-hover:rotate-0 transition-transform">
-                  <p className="text-caption font-bold mb-1 uppercase tracking-wider text-canvas/80">Scan Time</p>
-                  <p className="text-4xl font-black">&lt; 0.8s</p>
+
+                <h1 className="mt-5 max-w-4xl text-[clamp(2.8rem,6.6vw,5.8rem)] font-black uppercase leading-[0.9] tracking-[-0.06em] text-ink">
+                  Plan, sell, scan, and report in one place.
+                </h1>
+
+                <p className="mt-5 max-w-xl text-base leading-7 text-ink-muted md:text-lg">
+                  Eventflow gives student teams a single workspace for tickets,
+                  check-ins, announcements, certificates, and event reporting.
+                </p>
+
+                <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+                  <Link href="/signup">
+                    <button className="inline-flex w-full items-center justify-center gap-2 border-[2px] border-border bg-primary px-5 py-4 text-sm font-black uppercase tracking-[0.18em] text-ink shadow-[6px_6px_0_0_var(--color-border)] transition-transform hover:-translate-x-1 hover:-translate-y-1 sm:w-auto">
+                      Start free
+                      <ArrowRight className="h-4 w-4" />
+                    </button>
+                  </Link>
+                  <Link href="/explore">
+                    <button className="inline-flex w-full items-center justify-center border-[2px] border-border bg-surface-1 px-5 py-4 text-sm font-black uppercase tracking-[0.18em] text-ink transition-colors hover:bg-surface-2 sm:w-auto">
+                      Explore events
+                    </button>
+                  </Link>
+                </div>
+
+                <div className="mt-8 grid gap-3 sm:grid-cols-3">
+                  {stats.map((item) => (
+                    <motion.div
+                      key={item.label}
+                      initial={{ opacity: 0, y: 14 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5, delay: 0.08, ease }}
+                      className="border-[2px] border-border bg-surface-1 p-4 shadow-brutal-sm"
+                    >
+                      <div className="text-3xl font-black uppercase tracking-[-0.04em] text-ink">
+                        {item.value}
+                      </div>
+                      <div className="mt-1 text-xs font-semibold uppercase tracking-[0.18em] text-ink-muted">
+                        {item.label}
+                      </div>
+                    </motion.div>
+                  ))}
                 </div>
               </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 24, rotate: 1.2 }}
+                animate={{ opacity: 1, y: 0, rotate: 0 }}
+                transition={{ duration: 0.8, ease }}
+                className="relative"
+              >
+                <div className="border-[2px] border-border bg-surface-1 p-4 shadow-[10px_10px_0_0_var(--color-border)]">
+                  <div className="flex items-center justify-between border-b border-border pb-3">
+                    <div>
+                      <p className="text-[11px] font-black uppercase tracking-[0.22em] text-ink-muted">
+                        Live dashboard
+                      </p>
+                      <p className="mt-1 text-sm font-semibold text-ink">
+                        Eventflow / Campus launch
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] text-primary">
+                      <CheckCircle2 className="h-4 w-4" />
+                      Ready
+                    </div>
+                  </div>
+
+                  <div className="mt-4 overflow-hidden border-[2px] border-border bg-canvas">
+                    <div className="h-[310px] w-full">
+                      <HeroScene />
+                    </div>
+                  </div>
+
+                  <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                    <div className="border-[2px] border-border bg-canvas p-4">
+                      <p className="text-[11px] font-black uppercase tracking-[0.2em] text-ink-muted">
+                        Check-in status
+                      </p>
+                      <p className="mt-2 text-2xl font-black text-ink">Fast lane</p>
+                      <p className="mt-1 text-sm text-ink-muted">
+                        Live scan queue with clear access roles.
+                      </p>
+                    </div>
+                    <div className="border-[2px] border-border bg-canvas p-4">
+                      <p className="text-[11px] font-black uppercase tracking-[0.2em] text-ink-muted">
+                        Event readiness
+                      </p>
+                      <p className="mt-2 text-2xl font-black text-ink">94%</p>
+                      <p className="mt-1 text-sm text-ink-muted">
+                        Tickets, staff, and comms in place.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="absolute -bottom-5 left-5 border-[2px] border-border bg-primary px-4 py-3 shadow-[6px_6px_0_0_var(--color-border)]">
+                  <p className="text-[11px] font-black uppercase tracking-[0.22em] text-ink-muted">
+                    Queue time
+                  </p>
+                  <p className="text-2xl font-black text-ink">&lt; 1 min</p>
+                </div>
+              </motion.div>
+            </div>
+
+            <div className="mt-14 border-y border-border py-5">
+              <div className="flex flex-wrap items-center justify-between gap-3 text-[11px] font-black uppercase tracking-[0.22em] text-ink-muted">
+                <span>Trusted by student teams and clubs</span>
+                <div className="flex flex-wrap gap-2">
+                  {chipLogos.map((logo) => (
+                    <span key={logo} className="border border-border bg-surface-1 px-3 py-2">
+                      {logo}
+                    </span>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         </section>
 
-        {/* Asymmetrical Features */}
-        <section className="py-24 lg:py-32 border-b-[4px] border-border bg-surface-1 relative overflow-hidden">
-          <div className="bg-diagonal-stripes-subtle absolute inset-0 pointer-events-none"></div>
-          
-          <div className="max-w-7xl mx-auto px-6 relative z-10">
-            <div className="mb-20">
-              <h2 className="text-display-lg text-ink max-w-3xl leading-[0.9]">
-                EVERYTHING<br/>YOU NEED.
-                <span className="block text-accent-cyan mt-2 rotate-1 bg-ink text-canvas w-fit px-4 border-[4px] border-border shadow-brutal inline-block">NOTHING YOU DON'T.</span>
+        <SectionShell
+          id="features"
+          eyebrow="Core modules"
+          title="Built for the full event lifecycle."
+          description="Everything is structured around the way campus teams actually work: prepare, publish, operate, and review."
+        >
+          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+            {features.map((feature, index) => (
+              <motion.article
+                key={feature.title}
+                initial={{ opacity: 0, y: 22 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{ duration: 0.55, delay: index * 0.05, ease }}
+                className="border-[2px] border-border bg-surface-1 p-6 shadow-brutal-sm transition-transform hover:-translate-y-1"
+              >
+                <div className="flex h-11 w-11 items-center justify-center border-[2px] border-border bg-primary text-ink shadow-brutal-sm">
+                  <feature.icon className="h-5 w-5" />
+                </div>
+                <h3 className="mt-5 text-xl font-black uppercase tracking-[-0.03em] text-ink">
+                  {feature.title}
+                </h3>
+                <p className="mt-3 text-sm leading-6 text-ink-muted">{feature.description}</p>
+              </motion.article>
+            ))}
+          </div>
+        </SectionShell>
+
+        <SectionShell
+          id="workflow"
+          eyebrow="Workflow"
+          title="A short path from setup to entry."
+          description="The layout stays linear so every step is visible without crowding the screen."
+        >
+          <div className="grid gap-5 lg:grid-cols-3">
+            {workflow.map((item, index) => (
+              <motion.article
+                key={item.step}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{ duration: 0.55, delay: index * 0.08, ease }}
+                className="border-[2px] border-border bg-surface-1 p-6 shadow-brutal-sm"
+              >
+                <div className="flex items-center justify-between gap-4 border-b border-border pb-4">
+                  <div className="flex h-11 w-11 items-center justify-center border-[2px] border-border bg-canvas text-ink shadow-brutal-sm">
+                    <item.icon className="h-5 w-5 text-primary" />
+                  </div>
+                  <span className="text-xs font-black uppercase tracking-[0.24em] text-ink-muted">
+                    {item.step}
+                  </span>
+                </div>
+                <h3 className="mt-5 text-xl font-black uppercase tracking-[-0.03em] text-ink">
+                  {item.title}
+                </h3>
+                <p className="mt-3 text-sm leading-6 text-ink-muted">{item.description}</p>
+              </motion.article>
+            ))}
+          </div>
+        </SectionShell>
+
+        <section id="showcase" className="border-t border-border bg-surface-1">
+          <div className="mx-auto max-w-6xl px-6 py-20 lg:py-24">
+            <div className="max-w-3xl">
+              <p className="text-[11px] font-black uppercase tracking-[0.24em] text-primary">
+                Showcase
+              </p>
+              <h2 className="mt-4 text-[clamp(2.2rem,4.8vw,4.4rem)] font-black uppercase leading-[0.95] tracking-[-0.05em] text-ink">
+                Clean surfaces for tickets, dashboards, and reporting.
               </h2>
+              <p className="mt-4 max-w-2xl text-sm leading-7 text-ink-muted md:text-base">
+                The product stays easy to scan: clear panels, direct labels, and enough structure to keep important data visible.
+              </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {features.map((feature, i) => (
-                <div 
-                  key={feature.title} 
-                  className={`border-[3px] border-border p-8 shadow-brutal brutal-hover-lift flex flex-col justify-between ${feature.color} ${feature.text} relative overflow-hidden group`}
+            <div className="mt-10 grid gap-5 lg:grid-cols-3">
+              {showcase.map((item, index) => (
+                <motion.article
+                  key={item.title}
+                  initial={{ opacity: 0, y: 22 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.2 }}
+                  transition={{ duration: 0.55, delay: index * 0.08, ease }}
+                  className="border-[2px] border-border bg-canvas p-4 shadow-brutal-sm"
                 >
-                  <div className="absolute -right-6 -bottom-6 opacity-10 group-hover:scale-110 transition-transform">
-                    <feature.icon className="w-48 h-48" />
+                  <div className="relative h-56 overflow-hidden border-[2px] border-border bg-surface-1">
+                    <Image src={item.image} alt={item.title} fill className="object-cover" />
                   </div>
-                  
-                  <div className="h-16 w-16 bg-canvas border-[3px] border-border flex items-center justify-center mb-12 shadow-[4px_4px_0_0_#0f0f0f] relative z-10">
-                    <feature.icon className="w-8 h-8 text-ink" />
-                  </div>
-                  <div className="relative z-10">
-                    <h3 className="text-headline uppercase mb-3 text-canvas">{feature.title}</h3>
-                    <p className="font-bold text-canvas/80 text-lg leading-snug">{feature.desc}</p>
-                  </div>
-                </div>
+                  <h3 className="mt-4 text-lg font-black uppercase tracking-[-0.03em] text-ink">
+                    {item.title}
+                  </h3>
+                  <p className="mt-2 text-sm leading-6 text-ink-muted">{item.description}</p>
+                </motion.article>
               ))}
             </div>
-            
-            {/* Massive Trust Bar underneath features */}
-            <div className="mt-20 border-[4px] border-border bg-canvas p-8 shadow-brutal flex flex-col md:flex-row items-center justify-between gap-8">
-              <p className="text-headline uppercase font-black text-ink">TRUSTED BY <span className="text-primary">ELITE</span> CLUBS</p>
-              <div className="flex flex-wrap justify-center md:justify-end gap-4">
-                {["IIT Delhi", "BITS Pilani", "NIT Trichy", "VIT"].map((name) => (
-                  <div key={name} className="px-4 py-2 border-[2px] border-border bg-surface-2 text-ink font-mono text-sm font-bold uppercase">
-                    {name}
-                  </div>
+          </div>
+        </section>
+
+        <SectionShell
+          id="proof"
+          eyebrow="Proof"
+          title="Built for teams that need composure on event day."
+          description="The product should feel direct to use and still look deliberate enough to trust."
+        >
+          <div className="grid gap-5 lg:grid-cols-3">
+            {testimonials.map((item, index) => (
+              <motion.article
+                key={item.name}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{ duration: 0.55, delay: index * 0.06, ease }}
+                className="border-[2px] border-border bg-surface-1 p-6 shadow-brutal-sm"
+              >
+                <MessageSquareQuote className="h-5 w-5 text-primary" />
+                <p className="mt-4 text-sm leading-7 text-ink">{item.quote}</p>
+                <div className="mt-6 border-t border-border pt-4">
+                  <p className="text-sm font-black uppercase tracking-[0.16em] text-ink">{item.name}</p>
+                  <p className="mt-1 text-xs uppercase tracking-[0.18em] text-ink-muted">{item.role}</p>
+                </div>
+              </motion.article>
+            ))}
+          </div>
+        </SectionShell>
+
+        <section id="faq" className="border-t border-border bg-canvas">
+          <div className="mx-auto max-w-6xl px-6 py-20 lg:py-24">
+            <div className="grid gap-8 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
+              <div>
+                <p className="text-[11px] font-black uppercase tracking-[0.24em] text-primary">
+                  FAQ
+                </p>
+                <h2 className="mt-4 text-[clamp(2rem,4.4vw,4rem)] font-black uppercase leading-[0.95] tracking-[-0.05em] text-ink">
+                  The questions teams ask before switching.
+                </h2>
+                <p className="mt-4 max-w-xl text-sm leading-7 text-ink-muted md:text-base">
+                  The answers are intentionally short. The interface should reduce uncertainty, not add another layer of it.
+                </p>
+              </div>
+
+              <div className="grid gap-4">
+                {faq.map((item) => (
+                  <article key={item.q} className="border-[2px] border-border bg-surface-1 p-5 shadow-brutal-sm">
+                    <h3 className="text-base font-black uppercase tracking-[-0.02em] text-ink">{item.q}</h3>
+                    <p className="mt-3 text-sm leading-6 text-ink-muted">{item.a}</p>
+                  </article>
                 ))}
               </div>
             </div>
           </div>
         </section>
 
-        {/* Brutal AI Section */}
-        <section className="py-24 lg:py-32 border-b-[4px] border-border bg-ink text-canvas relative">
-          <div className="max-w-7xl mx-auto px-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-              
-              <div className="order-2 lg:order-1">
-                <div className="border-[4px] border-primary bg-canvas text-ink shadow-[12px_12px_0_0_#bfff00] p-6 font-mono relative">
-                  {/* Console Header */}
-                  <div className="flex items-center justify-between mb-6 border-b-[3px] border-border pb-4">
-                    <div className="flex gap-2">
-                      <div className="w-5 h-5 bg-accent-pink border-[2px] border-border" />
-                      <div className="w-5 h-5 bg-primary border-[2px] border-border" />
-                      <div className="w-5 h-5 bg-accent-cyan border-[2px] border-border" />
-                    </div>
-                    <Terminal className="w-6 h-6 text-ink" />
-                  </div>
-                  
-                  {/* Console Body */}
-                  <div className="text-sm lg:text-base font-bold">
-                    <p className="text-ink-muted mb-4">
-                      <span className="text-primary mr-2">&gt;</span> 
-                      groq generate --context "Web3 Hackathon"
-                    </p>
-                    <div className="bg-surface-2 border-[2px] border-border p-5 mt-4 relative">
-                      <div className="absolute -top-3 -right-3 bg-accent-cyan text-canvas text-xs px-2 py-1 border-[2px] border-border rotate-[5deg]">
-                        Output
-                      </div>
-                      <p className="text-ink leading-relaxed">
-                        Join 200+ builders for a 48-hour sprint into decentralized apps. 
-                        Workshops, mentors, ₹2L in prizes. No experience required — just curiosity and caffeine.
-                      </p>
-                    </div>
-                    <p className="text-accent-pink mt-6 text-xs tracking-widest uppercase flex items-center">
-                      <span className="inline-block w-2 h-2 bg-accent-pink animate-pulse mr-2 rounded-full"></span>
-                      GENERATED IN 340ms
-                    </p>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="order-1 lg:order-2">
-                <div className="inline-block bg-primary text-canvas font-mono font-bold text-sm uppercase px-3 py-1 border-[2px] border-border shadow-brutal-sm mb-6">
-                  <Sparkles className="w-4 h-4 mr-2 inline" />
-                  GROQ CO-PILOT
-                </div>
-                <h2 className="text-display-md text-canvas mb-8 leading-[0.9]">
-                  STOP STARING<br/>AT BLANK PAGES.
+        <section className="border-t border-border bg-surface-1">
+          <div className="mx-auto max-w-6xl px-6 py-20 lg:py-24">
+            <div className="grid gap-8 border-[2px] border-border bg-canvas p-6 shadow-[10px_10px_0_0_var(--color-border)] lg:grid-cols-[1.1fr_0.9fr] lg:p-8">
+              <div>
+                <p className="text-[11px] font-black uppercase tracking-[0.24em] text-primary">
+                  Ready to build
+                </p>
+                <h2 className="mt-4 text-[clamp(2.2rem,5vw,4.4rem)] font-black uppercase leading-[0.92] tracking-[-0.06em] text-ink">
+                  Ship a cleaner event flow this week.
                 </h2>
-                <div className="border-l-[6px] border-accent-pink pl-6">
-                  <p className="text-subhead text-canvas/80">
-                    Generate descriptions, social copy, and emails instantly. 
-                    Zero latency. Pure momentum.
+                <p className="mt-4 max-w-2xl text-sm leading-7 text-ink-muted md:text-base">
+                  Start with the landing page, move into the event workspace, and let the system do the repetitive work.
+                </p>
+              </div>
+
+              <div className="flex flex-col justify-between gap-4 border-[2px] border-border bg-surface-1 p-5">
+                <div className="flex items-center gap-3">
+                  <BadgeCheck className="h-5 w-5 text-primary" />
+                  <p className="text-sm font-semibold text-ink">
+                    Everything organizers need in one place.
                   </p>
+                </div>
+                <div className="flex flex-col gap-3 sm:flex-row">
+                  <Link href="/signup" className="flex-1">
+                    <button className="w-full border-[2px] border-border bg-primary px-5 py-4 text-sm font-black uppercase tracking-[0.18em] text-ink shadow-[6px_6px_0_0_var(--color-border)] transition-transform hover:-translate-x-1 hover:-translate-y-1">
+                      Create account
+                    </button>
+                  </Link>
+                  <Link href="/login" className="flex-1">
+                    <button className="w-full border-[2px] border-border bg-canvas px-5 py-4 text-sm font-black uppercase tracking-[0.18em] text-ink transition-colors hover:bg-surface-2">
+                      Log in
+                    </button>
+                  </Link>
                 </div>
               </div>
             </div>
           </div>
         </section>
-
-        {/* Aggressive CTA */}
-        <section className="py-32 bg-accent-pink border-b-[8px] border-border relative overflow-hidden">
-          <div className="bg-diagonal-stripes absolute inset-0 opacity-20 mix-blend-overlay"></div>
-          <div className="max-w-5xl mx-auto px-6 text-center relative z-10 flex flex-col items-center">
-            <h2 className="text-[clamp(60px,10vw,140px)] font-black uppercase leading-[0.8] tracking-tighter text-canvas mb-12 drop-shadow-[4px_4px_0_#0f0f0f]">
-              DEPLOY<br/>NOW.
-            </h2>
-            <Link href="/signup">
-              <button className="text-2xl py-8 px-16 uppercase font-black bg-primary text-canvas border-[4px] border-border shadow-[12px_12px_0_0_#0f0f0f] hover:shadow-[4px_4px_0_0_#0f0f0f] hover:translate-x-[8px] hover:translate-y-[8px] transition-all rounded-none">
-                CREATE CLUB ACCOUNT
-              </button>
-            </Link>
-          </div>
-        </section>
       </div>
     </PublicLayout>
+  );
+}
+
+function SectionShell({
+  id,
+  eyebrow,
+  title,
+  description,
+  children,
+}: {
+  id: string;
+  eyebrow: string;
+  title: string;
+  description: string;
+  children: ReactNode;
+}) {
+  return (
+    <section id={id} className="border-t border-border">
+      <div className="mx-auto max-w-6xl px-6 py-20 lg:py-24">
+        <div className="max-w-3xl">
+          <p className="text-[11px] font-black uppercase tracking-[0.24em] text-primary">
+            {eyebrow}
+          </p>
+          <h2 className="mt-4 text-[clamp(2.2rem,4.8vw,4.4rem)] font-black uppercase leading-[0.95] tracking-[-0.05em] text-ink">
+            {title}
+          </h2>
+          <p className="mt-4 max-w-2xl text-sm leading-7 text-ink-muted md:text-base">
+            {description}
+          </p>
+        </div>
+        <div className="mt-10">{children}</div>
+      </div>
+    </section>
   );
 }
