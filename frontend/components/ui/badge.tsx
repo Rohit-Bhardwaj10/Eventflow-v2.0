@@ -2,17 +2,21 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: "default" | "success";
+  variant?: "default" | "success" | "yellow" | "pink" | "cyan" | "lime" | "dark";
 }
 
 function Badge({ className, variant = "default", ...props }: BadgeProps) {
   return (
     <div
       className={cn(
-        "inline-flex items-center rounded-pill px-2 py-[2px] text-caption font-medium transition-colors",
+        "inline-flex items-center border-brutal-2 shadow-brutal-sm px-3 py-1 text-caption",
         {
-          "bg-surface-2 text-ink-muted": variant === "default",
-          "bg-semantic-success/10 text-semantic-success": variant === "success",
+          "bg-surface-1 text-ink": variant === "default",
+          "bg-accent-lime text-ink": variant === "success" || variant === "lime",
+          "bg-primary text-ink": variant === "yellow",
+          "bg-accent-pink text-ink": variant === "pink",
+          "bg-accent-cyan text-ink": variant === "cyan",
+          "bg-inverse-canvas text-inverse-ink": variant === "dark",
         },
         className
       )}
