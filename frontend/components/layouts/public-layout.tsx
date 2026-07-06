@@ -55,7 +55,7 @@ export function PublicLayout({ children }: { children: ReactNode }) {
         </header>
       </div>
 
-      <main className="flex-1 flex flex-col">{children}</main>
+      <main className="flex-1 flex flex-col pt-28">{children}</main>
 
       <footer className="border-t-[2px] border-border bg-surface-1 text-ink">
         <div className="mx-auto grid max-w-6xl grid-cols-1 gap-10 px-6 py-14 md:grid-cols-12">

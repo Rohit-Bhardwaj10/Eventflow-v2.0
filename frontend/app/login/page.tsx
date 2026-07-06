@@ -41,7 +41,7 @@ export default function LoginPage() {
 
   return (
     <PublicLayout>
-      <div className="flex-1 flex items-center justify-center px-6 py-16">
+      <div className="flex-1 flex items-center justify-center px-6 pb-16">
         <Card variant="default" className="w-full max-w-md relative">
           <Badge variant="yellow" className="absolute -top-3 -right-3 rotate-3">
             Welcome back

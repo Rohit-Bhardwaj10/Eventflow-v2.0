@@ -48,7 +48,7 @@ export default function ClubsPage() {
 
   return (
     <PublicLayout>
-      <div className="max-w-7xl mx-auto px-6 py-16 w-full flex flex-col">
+      <div className="max-w-7xl mx-auto px-6 pb-16 w-full flex flex-col">
         {/* Header */}
         <div className="flex flex-col gap-5 mb-12">
           <Badge variant="yellow" className="w-fit rotate-1">

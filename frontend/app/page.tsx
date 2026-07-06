@@ -164,7 +164,7 @@ export default function LandingPage() {
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(183,188,248,0.12),_transparent_36%),radial-gradient(circle_at_bottom_right,_rgba(73,128,115,0.1),_transparent_24%)]" />
         <div className="pointer-events-none absolute inset-0 opacity-[0.06] [background-image:linear-gradient(rgba(244,244,240,0.2)_1px,transparent_1px),linear-gradient(90deg,rgba(244,244,240,0.2)_1px,transparent_1px)] [background-size:42px_42px]" />
 
-        <section className="relative pt-32 md:pt-36">
+        <section className="relative pt-4 md:pt-8">
           <div className="mx-auto max-w-6xl px-6 pb-16 lg:pb-20">
             <div className="grid items-center gap-10 lg:grid-cols-[1.03fr_0.97fr]">
               <motion.div
