@@ -10,12 +10,14 @@ const BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
 
 function getAccessToken(): string | null {
   if (typeof window === 'undefined') return null;
-  return localStorage.getItem('ef_access');
+  const token = localStorage.getItem('ef_access');
+  return token === 'undefined' ? null : token;
 }
 
 function getRefreshToken(): string | null {
   if (typeof window === 'undefined') return null;
-  return localStorage.getItem('ef_refresh');
+  const token = localStorage.getItem('ef_refresh');
+  return token === 'undefined' ? null : token;
 }
 
 export function setTokens(access: string, refresh: string) {
@@ -71,7 +73,12 @@ async function request<T>(
 
   // 204 No Content
   if (res.status === 204) return undefined as unknown as T;
-  return res.json() as Promise<T>;
+  
+  const body = await res.json();
+  if (body && typeof body === 'object' && 'success' in body && 'data' in body) {
+    return body.data as T;
+  }
+  return body as T;
 }
 
 async function tryRefresh(): Promise<boolean> {
@@ -84,7 +91,10 @@ async function tryRefresh(): Promise<boolean> {
       body: JSON.stringify({ refreshToken: rToken }),
     });
     if (!res.ok) return false;
-    const data = await res.json();
+    
+    const body = await res.json();
+    const data = (body && typeof body === 'object' && 'success' in body && 'data' in body) ? body.data : body;
+    
     setTokens(data.accessToken, data.refreshToken ?? rToken);
     return true;
   } catch {

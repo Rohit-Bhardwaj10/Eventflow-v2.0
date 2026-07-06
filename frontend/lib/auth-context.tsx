@@ -32,7 +32,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const refreshUser = useCallback(async () => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('ef_access') : null;
-    if (!token) {
+    if (!token || token === 'undefined') {
       setUser(null);
       setLoading(false);
       return;
