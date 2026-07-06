@@ -108,7 +108,7 @@ export default function ClubDetailPage() {
 
   return (
     <PublicLayout>
-      <div className="max-w-5xl mx-auto px-6 pb-12 w-full">
+      <div className="max-w-5xl mx-auto px-6 py-12 w-full">
         <Link href="/clubs" className="inline-flex items-center gap-2 text-sm text-ink-muted hover:text-ink mb-8 transition-colors">
           <ArrowLeft className="h-4 w-4" />
           Back to Clubs

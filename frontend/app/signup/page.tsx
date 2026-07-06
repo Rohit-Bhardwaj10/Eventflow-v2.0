@@ -54,7 +54,7 @@ export default function SignupPage() {
 
   return (
     <PublicLayout>
-      <div className="flex-1 flex items-center justify-center px-6 pb-16">
+      <div className="flex-1 flex items-center justify-center px-6 py-16">
         <Card variant="default" className="w-full max-w-md relative">
           <Badge variant="cyan" className="absolute -top-3 -right-3 -rotate-2">
             New account
