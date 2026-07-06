@@ -12,12 +12,13 @@ const variantStyles: Record<NonNullable<CardProps["variant"]>, string> = {
   "pricing-featured": "bg-surface-2 text-ink p-6 shadow-brutal-lg",
   "product-screenshot": "bg-surface-1 text-ink p-6 shadow-brutal-lg",
   testimonial: "bg-surface-2 text-ink p-8",
-  "logo-tile": "bg-canvas text-ink-subtle p-4 border-brutal-2 shadow-brutal-sm",
-  "accent-yellow": "bg-primary text-ink p-6",
-  "accent-pink": "bg-accent-pink text-ink p-6",
+  "logo-tile": "bg-canvas text-ink-subtle p-4 shadow-brutal-sm",
+  "accent-yellow": "bg-accent-yellow text-canvas p-6",
+  "accent-pink": "bg-accent-pink text-canvas p-6",
   "accent-cyan": "bg-accent-cyan text-ink p-6",
-  "accent-lime": "bg-accent-lime text-ink p-6",
+  "accent-lime": "bg-accent-lime text-canvas p-6",
 }
+
 
 const Card = React.forwardRef<HTMLDivElement, CardProps>(
   ({ className, variant = "default", ...props }, ref) => {

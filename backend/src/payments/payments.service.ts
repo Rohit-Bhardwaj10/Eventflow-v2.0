@@ -12,7 +12,7 @@ import { CreateOrderDto } from './dto/create-order.dto';
 import { VerifyPaymentDto } from './dto/verify-payment.dto';
 import { PaymentStatus } from '../generated/prisma/enums';
 import * as crypto from 'crypto';
-import Razorpay from 'razorpay';
+import Razorpay = require('razorpay');
 
 @Injectable()
 export class PaymentsService {
@@ -24,8 +24,8 @@ export class PaymentsService {
     private readonly config: ConfigService,
   ) {
     this.razorpay = new Razorpay({
-      key_id: this.config.get<string>('razorpay.keyId') ?? '',
-      key_secret: this.config.get<string>('razorpay.keySecret') ?? '',
+      key_id: this.config.get<string>('razorpay.keyId') || 'dummy_key_id',
+      key_secret: this.config.get<string>('razorpay.keySecret') || 'dummy_key_secret',
     });
   }
 

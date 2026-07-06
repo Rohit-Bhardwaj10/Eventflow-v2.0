@@ -7,15 +7,17 @@
   --color-canvas: #0a0a0a; /* Top: Black */
   --color-surface-1: #1c2623; /* Darker variant of second color */
   --color-surface-2: #31423d; /* Second: Dark Slate Green */
+  --color-surface-3: #3f554e; /* Lighter surface */
   
   --color-border: #498073; /* Third: Muted Teal */
   
   --color-primary: #b7bcf8; /* Fourth: Periwinkle */
   --color-primary-hover: #9ca3f5;
   
-  --color-accent-pink: #b7bcf8;
+  --color-accent-pink: #f0a5c0;
   --color-accent-cyan: #498073;
-  --color-accent-yellow: #31423d;
+  --color-accent-yellow: #f5d76e;
+  --color-accent-lime: #a8d672;
   
   --color-ink: #f4f4f0; /* Off-white text */
   --color-ink-muted: #a3a3a3;
@@ -65,6 +67,14 @@
 @layer utilities {
   .border-brutal {
     border: 3px solid var(--color-border);
+  }
+
+  .border-brutal-2 {
+    border: 2px solid var(--color-border);
+  }
+
+  .border-hairline {
+    border: 1px solid var(--color-border);
   }
 
   .shadow-brutal {
@@ -133,6 +143,38 @@
     font-size: 20px;
     font-weight: 600;
     line-height: 1.4;
+  }
+
+  .text-body {
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.6;
+  }
+
+  .text-body-sm {
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.5;
+  }
+
+  .text-button {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .text-eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .text-card-title {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
   }
   
   .text-caption {
