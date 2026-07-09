@@ -2,7 +2,8 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { motion, useInView, animate } from 'framer-motion';
+import { useEffect, useRef, useState } from 'react';
 import {
   CheckCircle2,
   Users,
@@ -12,48 +13,322 @@ import {
   CreditCard,
   QrCode,
   LineChart,
-  LayoutDashboard
+  LayoutDashboard,
+  Bell
 } from 'lucide-react';
 import { PublicLayout } from '@/components/layouts/public-layout';
 
-const floatingBubbles = [
-  { icon: CheckCircle2, label: "RSVP Confirmed", top: "25%", left: "8%", delay: 0, rotate: -4 },
-  { icon: Users, label: "+42 this week", top: "15%", right: "12%", delay: 0.2, rotate: 3 },
-  { icon: Star, label: "New Event", bottom: "35%", right: "8%", delay: 0.4, rotate: -2 },
-  { icon: UsersRound, label: "+2 members", bottom: "45%", left: "12%", delay: 0.6, rotate: 4 },
-];
+// const floatingBubbles = [
+//   { icon: CheckCircle2, label: "RSVP Confirmed", top: "25%", left: "8%", delay: 0, rotate: -4 },
+//   { icon: Users, label: "+42 this week", top: "15%", right: "12%", delay: 0.2, rotate: 3 },
+//   { icon: Star, label: "New Event", bottom: "35%", right: "8%", delay: 0.4, rotate: -2 },
+//   { icon: UsersRound, label: "+2 members", bottom: "45%", left: "12%", delay: 0.6, rotate: 4 },
+// ];
 
 const ease = [0.16, 1, 0.3, 1] as const;
+
+// Animation Helpers
+function FadeIn({ children, delay = 0, className = '', y = 10, scale = 1 }: { children: React.ReactNode, delay?: number, className?: string, y?: number, scale?: number }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y, scale }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+      viewport={{ once: true, margin: '-80px' }}
+      transition={{ duration: 0.7, delay, ease }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+const fadeVariants = {
+  hidden: { opacity: 0, y: 10 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease } }
+};
+
+function StaggerContainer({ children, className = '', delayChildren = 0.1, staggerChildren = 0.1 }: { children: React.ReactNode, className?: string, delayChildren?: number, staggerChildren?: number }) {
+  return (
+    <motion.div
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, margin: '-80px' }}
+      variants={{
+        hidden: {},
+        visible: {
+          transition: {
+            staggerChildren,
+            delayChildren,
+          }
+        }
+      }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+function StaggerItem({ children, className = '' }: { children: React.ReactNode, className?: string }) {
+  return (
+    <motion.div variants={fadeVariants} className={className}>
+      {children}
+    </motion.div>
+  );
+}
+
+// Animated counter hook
+function useCountUp(target: number, inView: boolean, duration = 1.5) {
+  const [value, setValue] = useState(0);
+  useEffect(() => {
+    if (!inView) return;
+    const controls = animate(0, target, {
+      duration,
+      ease: 'easeOut',
+      onUpdate: (v) => setValue(Math.round(v)),
+    });
+    return controls.stop;
+  }, [inView, target, duration]);
+  return value;
+}
+
+function DashboardMockup() {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, margin: '-80px' });
+
+  const members = useCountUp(1248, inView, 1.8);
+  const funds = useCountUp(3420, inView, 2.0);
+  const rsvp1 = useCountUp(340, inView, 1.6);
+  const rsvp2 = useCountUp(120, inView, 1.4);
+  const rsvp3 = useCountUp(85, inView, 1.3);
+
+  // Toast notification state
+  const [toast, setToast] = useState(false);
+  useEffect(() => {
+    if (!inView) return;
+    const t1 = setTimeout(() => setToast(true), 2200);
+    const t2 = setTimeout(() => setToast(false), 5000);
+    return () => { clearTimeout(t1); clearTimeout(t2); };
+  }, [inView]);
+
+  // Fake cursor animation — clicks "New Event" then retreats
+  const [cursorPhase, setCursorPhase] = useState<'idle' | 'moving' | 'clicked' | 'retreating'>('idle');
+  useEffect(() => {
+    if (!inView) return;
+    const phases: Array<[typeof cursorPhase, number]> = [
+      ['moving', 800],
+      ['clicked', 1200],
+      ['retreating', 2000],
+      ['idle', 2400],
+    ];
+    const timers = phases.map(([phase, delay]) =>
+      setTimeout(() => setCursorPhase(phase), delay)
+    );
+    return () => timers.forEach(clearTimeout);
+  }, [inView]);
+
+  return (
+    <div ref={ref} className="relative w-full">
+      {/* Fade overlay */}
+      <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-canvas to-transparent z-10 pointer-events-none rounded-b-[20px]" />
+
+      {/* Toast notification */}
+      <motion.div
+        initial={{ opacity: 0, y: -12, scale: 0.95 }}
+        animate={toast ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: -12, scale: 0.95 }}
+        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+        className="absolute top-14 right-4 z-30 flex items-center gap-3 bg-white border border-border/60 rounded-2xl shadow-soft-lg px-4 py-3 min-w-[220px]"
+      >
+        <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center shrink-0">
+          <Bell className="w-4 h-4 text-green-600" />
+        </div>
+        <div className="flex flex-col">
+          <span className="text-[12px] font-bold text-ink">New RSVP!</span>
+          <span className="text-[11px] text-ink-muted">Jordan Lee joined Fall Rush 2026</span>
+        </div>
+        <div className="w-2 h-2 rounded-full bg-green-500 ml-auto animate-pulse shrink-0" />
+      </motion.div>
+
+      {/* Fake cursor */}
+      <motion.div
+        className="absolute z-30 pointer-events-none"
+        initial={{ right: '18%', top: '18%', opacity: 0 }}
+        animate={{
+          right: cursorPhase === 'moving' || cursorPhase === 'clicked' ? '13%' : '18%',
+          top: cursorPhase === 'moving' || cursorPhase === 'clicked' ? '13%' : '18%',
+          opacity: cursorPhase === 'idle' ? 0 : 1,
+          scale: cursorPhase === 'clicked' ? 0.85 : 1,
+        }}
+        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+      >
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M4 2l12 7-6 1-3 6L4 2z" fill="#0d3b38" stroke="white" strokeWidth="1.2" />
+        </svg>
+      </motion.div>
+
+      <div className="glass-panel rounded-[20px] p-2 md:p-3 shadow-glass border border-white/60">
+        <div className="bg-white rounded-xl overflow-hidden border border-border/60 shadow-inner relative aspect-[4/3] md:aspect-[16/9]">
+          {/* Browser Header */}
+          <div className="absolute top-0 w-full h-12 bg-surface-2/50 flex items-center px-4 gap-4 border-b border-border/40">
+            <div className="flex gap-1.5">
+              <div className="w-3 h-3 rounded-full bg-red-400" />
+              <div className="w-3 h-3 rounded-full bg-amber-400" />
+              <div className="w-3 h-3 rounded-full bg-green-400" />
+            </div>
+            <div className="h-6 flex-1 max-w-sm bg-white rounded-md border border-border/50 hidden sm:block" />
+          </div>
+
+          {/* App Body */}
+          <div className="absolute top-12 bottom-0 w-full flex bg-[#fafafa]">
+            {/* Sidebar */}
+            <div className="w-48 lg:w-56 bg-surface-1 border-r border-border/50 p-4 hidden md:flex flex-col gap-6">
+              <div className="flex items-center gap-2 px-2">
+                <div className="w-7 h-7 rounded-md bg-primary text-white flex items-center justify-center font-bold text-sm shadow-sm">C</div>
+                <span className="font-semibold text-[15px] text-ink">ClubSync</span>
+              </div>
+              <div className="space-y-1">
+                <div className="flex gap-3 items-center px-3 py-2.5 bg-surface-3/50 rounded-lg text-primary shadow-sm border border-border/50">
+                  <LayoutDashboard className="w-4 h-4" />
+                  <span className="text-sm font-medium">Dashboard</span>
+                </div>
+                {[{ icon: Star, label: 'Events' }, { icon: Users, label: 'Members' }, { icon: CreditCard, label: 'Finances' }, { icon: QrCode, label: 'Check-in' }].map(({ icon: Icon, label }) => (
+                  <div key={label} className="flex gap-3 items-center px-3 py-2.5 text-ink-muted rounded-lg">
+                    <Icon className="w-4 h-4" />
+                    <span className="text-sm font-medium">{label}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Main Area */}
+            <div className="flex-1 p-6 lg:p-8 flex flex-col gap-6 overflow-hidden">
+              {/* Top bar */}
+              <div className="flex justify-between items-center">
+                <div>
+                  <h2 className="text-2xl font-semibold text-ink tracking-tight">Overview</h2>
+                  <p className="text-sm text-ink-muted mt-1">Welcome back, Alex. Here's what's happening today.</p>
+                </div>
+                <motion.button
+                  animate={cursorPhase === 'clicked' ? { scale: 0.95, backgroundColor: '#114e4a' } : { scale: 1, backgroundColor: '#0d3b38' }}
+                  transition={{ duration: 0.15 }}
+                  className="text-white px-4 py-2.5 flex items-center gap-2 rounded-full text-[13px] font-medium shadow-soft"
+                >
+                  <span className="text-lg leading-none mt-[-2px]">+</span> New Event
+                </motion.button>
+              </div>
+
+              {/* Stats row — animated counters */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="bg-white border border-border/50 rounded-xl shadow-sm p-5 flex flex-col gap-1">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-xs font-semibold uppercase tracking-wider text-ink-muted">Total Members</span>
+                    <UsersRound className="w-4 h-4 text-ink-muted" />
+                  </div>
+                  <span className="text-3xl font-bold text-ink tracking-tight">{members.toLocaleString()}</span>
+                  <span className="text-xs font-medium text-green-600 flex items-center gap-1 mt-1 bg-green-50 w-fit px-2 py-0.5 rounded-full">↑ 12% this month</span>
+                </div>
+                <div className="bg-white border border-border/50 rounded-xl shadow-sm p-5 flex flex-col gap-1">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-xs font-semibold uppercase tracking-wider text-ink-muted">Active Events</span>
+                    <Star className="w-4 h-4 text-ink-muted" />
+                  </div>
+                  <span className="text-3xl font-bold text-ink tracking-tight">4</span>
+                  <span className="text-xs font-medium text-ink-subtle mt-1 flex items-center gap-1 bg-surface-2 w-fit px-2 py-0.5 rounded-full">2 upcoming this week</span>
+                </div>
+                <div className="bg-white border border-border/50 rounded-xl shadow-sm p-5 flex flex-col gap-1">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-xs font-semibold uppercase tracking-wider text-ink-muted">Funds Collected</span>
+                    <LineChart className="w-4 h-4 text-ink-muted" />
+                  </div>
+                  <span className="text-3xl font-bold text-ink tracking-tight">${funds.toLocaleString()}</span>
+                  <span className="text-xs font-medium text-green-600 flex items-center gap-1 mt-1 bg-green-50 w-fit px-2 py-0.5 rounded-full">↑ $850 this week</span>
+                </div>
+              </div>
+
+              {/* Events list — animated progress bars + counters */}
+              <div className="flex-1 bg-white border border-border/50 rounded-xl shadow-sm p-5 flex flex-col gap-4 overflow-hidden">
+                <div className="flex items-center justify-between border-b border-border/40 pb-3">
+                  <h3 className="font-semibold text-ink text-[15px]">Upcoming Events</h3>
+                  <span className="text-[13px] font-medium text-primary">View all</span>
+                </div>
+                <div className="flex flex-col gap-3 overflow-hidden">
+                  {[
+                    { month: 'Oct', day: 15, name: 'Fall Rush 2026', loc: 'Main Quad • 10:00 AM', rsvp: rsvp1, cap: 500, color: 'accent-teal' },
+                    { month: 'Oct', day: 18, name: 'Hackathon Prep', loc: 'Student Center • 6:00 PM', rsvp: rsvp2, cap: 150, color: 'primary' },
+                    { month: 'Oct', day: 22, name: 'General Body Meeting', loc: 'Room 402 • 7:00 PM', rsvp: rsvp3, cap: 100, color: 'amber' },
+                  ].map(({ month, day, name, loc, rsvp, cap, color }) => {
+                    const pct = Math.round((rsvp / cap) * 100);
+                    const dotColor = color === 'accent-teal' ? 'bg-accent-teal' : color === 'primary' ? 'bg-primary' : 'bg-amber-500';
+                    const barColor = color === 'accent-teal' ? 'bg-accent-teal' : color === 'primary' ? 'bg-primary' : 'bg-amber-500';
+                    const bgColor = color === 'accent-teal' ? 'bg-accent-teal/10 border-accent-teal/20 text-accent-teal' : color === 'primary' ? 'bg-primary/10 border-primary/20 text-primary' : 'bg-amber-500/10 border-amber-500/20 text-amber-600';
+                    return (
+                      <div key={name} className="flex items-center justify-between p-3 rounded-xl border border-border/40 shadow-sm gap-4">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className={`w-11 h-11 border rounded-lg flex flex-col items-center justify-center shrink-0 ${bgColor}`}>
+                            <span className="text-[9px] font-bold uppercase tracking-wider leading-none mb-0.5">{month}</span>
+                            <span className="text-base font-bold leading-none">{day}</span>
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-[14px] font-semibold text-ink truncate">{name}</p>
+                            <p className="text-[12px] text-ink-muted mt-0.5 truncate">{loc}</p>
+                          </div>
+                        </div>
+                        <div className="text-right shrink-0 flex flex-col items-end gap-1.5">
+                          <p className="text-[14px] font-semibold text-ink">{rsvp.toLocaleString()} <span className="text-ink-subtle font-normal">/ {cap}</span></p>
+                          <div className="w-24 h-1.5 bg-surface-2 rounded-full overflow-hidden">
+                            <motion.div
+                              className={`h-full rounded-full ${barColor}`}
+                              initial={{ width: 0 }}
+                              animate={{ width: inView ? `${pct}%` : 0 }}
+                              transition={{ duration: 1.5, ease: 'easeOut', delay: 0.6 }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function LandingPage() {
   return (
     <PublicLayout>
       <div className="relative isolate overflow-hidden bg-canvas selection:bg-accent-teal selection:text-white pb-24">
-        
+
+        {/* Full-page subtle grid texture */}
+        <div className="pointer-events-none fixed inset-0 z-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:28px_28px] [mask-image:radial-gradient(ellipse_80%_80%_at_50%_30%,#000_40%,transparent_100%)]" />
+
         {/* HERO SECTION */}
         <section className="relative w-full">
-          <div className="relative bg-surface-2 overflow-hidden min-h-screen flex flex-col items-center pt-40 pb-48">
-            
+          <div className="relative bg-surface-2 min-h-screen flex flex-col items-center pt-40 pb-28">
+
             {/* Background Image/Gradient */}
-            <div className="absolute inset-0 z-0">
-              <Image 
-                src="/Image.png" 
-                alt="Background" 
-                fill 
+            <div className="absolute inset-0 z-0 overflow-hidden">
+              <Image
+                src="/Image.png"
+                alt="Background"
+                fill
                 className="object-cover"
                 priority
               />
             </div>
 
             {/* Top Left Label */}
-            <div className="absolute top-28 left-4 md:left-8 z-10 flex items-center gap-2 text-ink-muted bg-white/40 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/60 shadow-sm">
-              <span className="text-xs font-semibold tracking-wide">✦ ClubSync.</span>
-            </div>
+            {/* <div className="absolute top-28 left-4 md:left-8 z-10 flex items-center gap-2 text-ink-muted bg-white/40 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/60 shadow-sm">
+              <span className="text-xs font-semibold tracking-wide">✦ EventFlow.</span>
+            </div> */}
 
             {/* Content Stack */}
-            <div className="relative z-10 flex flex-col items-center text-center max-w-4xl px-6 w-full mt-8 md:mt-16">
-              
-              <motion.div 
+            <div className="relative z-10 flex flex-col items-center text-center max-w-4xl px-6 w-full mt-4 md:mt-10">
+
+              <motion.div
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, ease }}
@@ -62,29 +337,29 @@ export default function LandingPage() {
                 <span className="text-xs font-semibold uppercase tracking-wider text-primary">Campus Events, Simplified.</span>
               </motion.div>
 
-              <motion.h1 
+              <motion.h1
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7, delay: 0.1, ease }}
                 className="text-display-xl text-primary font-playfair"
               >
-                Every Club. <span className="italic font-normal">One Sync.</span>
+                Your Campus Events. <br /><span className="italic font-normal">Finally Centralized.</span>
               </motion.h1>
 
-              <motion.p 
+              <motion.p
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7, delay: 0.2, ease }}
-                className="mt-6 text-lg md:text-xl text-ink-muted max-w-2xl font-medium"
+                className="mt-4 text-[16px] md:text-[18px] leading-relaxed text-ink-muted max-w-2xl font-medium"
               >
-                Discover events, manage clubs, and never miss what&apos;s happening on campus.
+                The all-in-one platform for college clubs to create, manage, and scale events. Stop wrestling with spreadsheets and group chats.
               </motion.p>
 
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7, delay: 0.3, ease }}
-                className="mt-10 flex flex-col sm:flex-row items-center gap-4"
+                className="mt-7 flex flex-col sm:flex-row items-center gap-4"
               >
                 <Link href="/signup">
                   <button className="bg-primary text-white px-8 py-3.5 rounded-full font-medium shadow-soft hover:bg-primary-hover transition-all hover:-translate-y-0.5">
@@ -101,19 +376,19 @@ export default function LandingPage() {
             </div>
 
             {/* Floating Bubbles */}
-            {floatingBubbles.map((bubble, i) => (
+            {/* {floatingBubbles.map((bubble, i) => (
               <motion.div
                 key={i}
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.8, delay: 0.5 + bubble.delay, ease }}
                 className="absolute hidden md:flex items-center gap-2 glass-pill px-4 py-2 rounded-full shadow-soft-sm z-10"
-                style={{ 
-                  top: bubble.top, 
-                  left: bubble.left, 
-                  right: bubble.right, 
-                  bottom: bubble.bottom, 
-                  transform: `rotate(${bubble.rotate}deg)` 
+                style={{
+                  top: bubble.top,
+                  left: bubble.left,
+                  right: bubble.right,
+                  bottom: bubble.bottom,
+                  transform: `rotate(${bubble.rotate}deg)`
                 }}
               >
                 <div className="bg-white p-1 rounded-full shadow-sm text-primary">
@@ -121,81 +396,45 @@ export default function LandingPage() {
                 </div>
                 <span className="text-[11px] font-semibold text-primary uppercase tracking-wide">{bubble.label}</span>
               </motion.div>
-            ))}
-
-            {/* Overlapping Dashboard Mockup */}
-            <motion.div 
-              initial={{ opacity: 0, y: 60 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.9, delay: 0.4, ease }}
-              className="absolute -bottom-32 md:-bottom-48 left-0 right-0 mx-auto w-11/12 max-w-5xl z-20 perspective-[2000px]"
-            >
-              <div className="glass-panel rounded-[20px] p-2 md:p-3 shadow-glass border border-white/60 transform rotateX-2 transition-transform hover:rotateX-0 duration-700">
-                <div className="bg-white rounded-xl overflow-hidden border border-border/60 shadow-inner relative aspect-[16/9] md:aspect-[21/9]">
-                  
-                  {/* Browser/App Header */}
-                  <div className="absolute top-0 w-full h-12 bg-surface-2/50 flex items-center px-4 gap-4 border-b border-border/40">
-                    <div className="flex gap-1.5">
-                      <div className="w-3 h-3 rounded-full bg-red-400"></div>
-                      <div className="w-3 h-3 rounded-full bg-amber-400"></div>
-                      <div className="w-3 h-3 rounded-full bg-green-400"></div>
-                    </div>
-                    <div className="h-6 flex-1 max-w-sm bg-white rounded-md border border-border/50 hidden sm:block"></div>
-                  </div>
-                  
-                  {/* Mock content representation */}
-                  <div className="absolute top-12 bottom-0 w-full flex bg-canvas/30">
-                    {/* Sidebar */}
-                    <div className="w-48 lg:w-56 bg-surface-1/80 border-r border-border/50 p-4 hidden md:flex flex-col gap-6">
-                      <div className="h-5 w-24 bg-surface-3 rounded mb-2"></div>
-                      <div className="space-y-4">
-                        {[1,2,3,4,5].map(i => (
-                          <div key={i} className="flex gap-3 items-center">
-                            <div className="h-5 w-5 bg-surface-3 rounded-md"></div>
-                            <div className="h-3 w-full bg-surface-2 rounded"></div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                    
-                    {/* Main Content Area */}
-                    <div className="flex-1 p-6 lg:p-8 flex flex-col gap-6 overflow-hidden">
-                      {/* Top bar */}
-                      <div className="flex justify-between items-center mb-2">
-                        <div className="h-8 w-48 bg-surface-3 rounded-md"></div>
-                        <div className="h-8 w-24 bg-primary/10 rounded-full"></div>
-                      </div>
-                      
-                      {/* Stats row */}
-                      <div className="grid grid-cols-3 gap-4">
-                         {[1,2,3].map(i => (
-                           <div key={i} className="h-24 bg-white border border-border/50 rounded-xl shadow-sm p-4 flex flex-col justify-between">
-                             <div className="h-3 w-16 bg-surface-3 rounded"></div>
-                             <div className="h-8 w-20 bg-surface-3 rounded"></div>
-                           </div>
-                         ))}
-                      </div>
-                      
-                      {/* List area */}
-                      <div className="flex-1 bg-white border border-border/50 rounded-xl shadow-sm p-4 flex flex-col gap-4">
-                        {[1,2,3].map(i => (
-                           <div key={i} className="h-12 w-full bg-surface-2/50 rounded-lg border border-border/30"></div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
+            ))} */}
 
           </div>
         </section>
 
-        {/* Spacing for overlapping mockup */}
-        <div className="h-48 md:h-64"></div>
+        {/* Dashboard Mockup - sits below hero, pulled up with negative margin */}
+        <motion.div
+          initial={{ opacity: 0, y: 60 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.9, delay: 0.4, ease }}
+          className="relative -mt-24 md:-mt-48 mx-auto w-full px-2 md:px-6 max-w-7xl z-20"
+        >
+          <DashboardMockup />
+        </motion.div>
+
+        {/* Social Proof Strip */}
+        <div className="py-6 md:py-8 flex flex-col items-center gap-6">
+          <FadeIn y={5} delay={0.1}>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-ink-muted">Built to streamline campus life</p>
+          </FadeIn>
+          <StaggerContainer className="flex flex-wrap items-center justify-center gap-6 mt-2" delayChildren={0.3} staggerChildren={0.15}>
+            {[
+              { value: "Discovery", label: "Centralized Campus Feed" },
+              { value: "Check-in", label: "Seamless QR Entry" },
+              { value: "Analytics", label: "Real-time Event Data" },
+            ].map(({ value, label }) => (
+              <StaggerItem key={label}>
+                <div className="relative flex flex-col items-center gap-1 px-8 py-4 rounded-2xl border border-white/50 bg-white/60 backdrop-blur-[20px] shadow-[0_4px_16px_rgba(0,0,0,0.06),inset_0_1px_0_rgba(255,255,255,1)] overflow-hidden">
+                  <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white to-transparent" />
+                  <span className="text-xl md:text-2xl font-bold text-primary tracking-tight">{value}</span>
+                  <span className="text-[11px] uppercase tracking-wider text-ink-muted font-semibold mt-1">{label}</span>
+                </div>
+              </StaggerItem>
+            ))}
+          </StaggerContainer>
+        </div>
 
         {/* WHY CLUBSYNC */}
-        <section id="why" className="relative scroll-mt-24 px-6 pt-[120px] pb-10 lg:px-0 overflow-hidden">
+        <section id="why" className="relative scroll-mt-24 px-6 pt-16 pb-10 lg:px-0 overflow-hidden">
           {/* Decorative Background Grid & Glows */}
           <div className="absolute inset-0 z-0 pointer-events-none flex justify-center overflow-hidden">
             <div className="absolute top-[-10%] w-[150%] h-[120%] bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:24px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_40%,#000_60%,transparent_100%)]"></div>
@@ -204,29 +443,17 @@ export default function LandingPage() {
             {/* Soft Gold/Blue Glow */}
             <div className="absolute top-[40%] right-[20%] w-[300px] h-[300px] bg-accent-gold/5 rounded-full blur-[80px]"></div>
           </div>
-          
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.7, ease }}
-            className="relative z-10 mx-auto flex max-w-[1200px] flex-col items-center gap-5 text-center"
-          >
-            <span className="glass-pill px-3 py-1 font-sans text-[11.5px] font-bold uppercase tracking-[0.15em] text-accent-teal shadow-sm">Why ClubSync</span>
+
+          <FadeIn y={10} className="relative z-10 mx-auto flex max-w-[1200px] flex-col items-center gap-5 text-center">
+            <span className="glass-pill px-3 py-1 font-sans text-[11.5px] font-bold uppercase tracking-[0.15em] text-accent-teal shadow-sm">Why EventFlow</span>
             <h2 className="text-[36px] font-playfair font-normal leading-[1.14] tracking-[-0.02em] text-ink sm:text-[46px]">
-              One platform in.<br className="hidden sm:block"/> A thriving club out.
+              One platform in.<br className="hidden sm:block" /> A thriving club out.
             </h2>
-          </motion.div>
-          
+          </FadeIn>
+
           <div className="relative z-10 mx-auto mt-20 flex max-w-[940px] flex-col items-center justify-center gap-8 md:flex-row md:gap-0">
             {/* Box 1 */}
-            <motion.div 
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.7, delay: 0.1, ease }}
-              className="relative w-[320px] max-w-full border border-border/80 bg-white/80 backdrop-blur-xl shadow-soft-lg rounded-2xl overflow-hidden z-20 group hover:-translate-y-1 transition-transform duration-300"
-            >
+            <FadeIn scale={0.97} delay={0.1} className="relative w-[320px] max-w-full border border-border/80 bg-white/80 backdrop-blur-xl shadow-soft-lg rounded-2xl overflow-hidden z-20 group hover:-translate-y-1 transition-transform duration-300">
               <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent pointer-events-none"></div>
               <div className="flex items-center gap-2 border-b border-border/60 bg-surface-2/50 px-5 py-3">
                 <LayoutDashboard className="w-4 h-4 text-ink-muted" />
@@ -238,31 +465,20 @@ export default function LandingPage() {
                 <div className="flex justify-between items-center"><span className="text-ink-muted">Capacity</span> <span className="text-ink font-medium">500 students</span></div>
                 <div className="flex justify-between items-center"><span className="text-ink-muted">Ticket</span> <span className="text-accent-teal font-semibold bg-accent-teal/10 px-2 py-0.5 rounded-md">$5 / entry</span></div>
               </div>
-            </motion.div>
+            </FadeIn>
 
-            {/* Connector */}
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.8 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.5, delay: 0.3, ease }}
-              className="flex shrink-0 flex-col items-center justify-center w-full md:w-20 lg:w-28 relative z-10 h-16 md:h-auto my-[-10px] md:my-0"
-            >
-              {/* Vertical line on mobile, Horizontal on desktop */}
-              <div className="absolute h-full w-[2px] md:w-full md:h-[2px] border-l-2 md:border-l-0 md:border-t-2 border-dashed border-border md:-mr-4"></div>
-              <div className="relative bg-white/90 backdrop-blur-sm px-3 py-1.5 border border-border rounded-full shadow-sm flex items-center justify-center z-10">
-                <span className="font-sans text-[9px] font-bold uppercase tracking-[0.15em] text-ink-muted whitespace-nowrap">Via ClubSync</span>
+            {/* Connector — pure dotted line */}
+            <FadeIn delay={0.2} className="flex shrink-0 items-center justify-center w-full md:w-32 lg:w-40 relative z-10 h-10 md:h-auto my-2 md:my-0">
+              {/* Mobile: vertical */}
+              <div className="flex md:hidden h-full w-full justify-center">
+                <div className="h-full border-l-2 border-dashed border-border/70" />
               </div>
-            </motion.div>
+              {/* Desktop: horizontal */}
+              <div className="hidden md:block w-full border-t-2 border-dashed border-border/70" />
+            </FadeIn>
 
             {/* Box 2 */}
-            <motion.div 
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.7, delay: 0.2, ease }}
-              className="relative w-[320px] max-w-full border border-border/80 bg-white/80 backdrop-blur-xl shadow-soft-lg rounded-2xl overflow-hidden z-20 group hover:-translate-y-1 transition-transform duration-300"
-            >
+            <FadeIn scale={0.97} delay={0.3} className="relative w-[320px] max-w-full border border-border/80 bg-white/80 backdrop-blur-xl shadow-soft-lg rounded-2xl overflow-hidden z-20 group hover:-translate-y-1 transition-transform duration-300">
               <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent pointer-events-none"></div>
               <div className="flex items-center gap-3 border-b border-border/60 px-5 py-3 bg-surface-2/50">
                 <span className="flex size-7 shrink-0 items-center justify-center bg-accent-teal/15 rounded-md font-sans text-[12px] font-bold text-accent-teal">C</span>
@@ -282,18 +498,12 @@ export default function LandingPage() {
               <div className="border-t border-border/60 bg-gradient-to-r from-accent-teal/5 to-transparent px-5 py-2.5 text-left font-sans text-[10px] font-bold uppercase tracking-[0.1em] text-accent-teal">
                 Sold out · $1200 collected
               </div>
-            </motion.div>
+            </FadeIn>
           </div>
-          
-          <motion.p 
-            initial={{ opacity: 0, y: 15 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.7, delay: 0.4, ease }}
-            className="relative z-10 mx-auto mt-16 max-w-[600px] text-center text-[17px] leading-[28px] text-ink-muted sm:text-[18px]"
-          >
-            Create your event once and ClubSync handles discovery, ticket sales, QR check-ins, and member roster sync. Zero spreadsheets required.
-          </motion.p>
+
+          <FadeIn delay={0.4} y={15} className="relative z-10 mx-auto mt-16 max-w-[600px] text-center text-[17px] leading-[28px] text-ink-muted sm:text-[18px]">
+            Create your event once and EventFlow handles discovery, ticket sales, QR check-ins, and member roster sync. Zero spreadsheets required.
+          </FadeIn>
         </section>
 
         <div className="mx-auto max-w-[1100px] px-6 pt-[100px] lg:px-0">
@@ -303,212 +513,361 @@ export default function LandingPage() {
         {/* HOW IT WORKS */}
         <section id="how" className="scroll-mt-24 px-6 pt-[104px] lg:px-0">
           <div className="mx-auto flex max-w-[1200px] flex-col gap-12">
-            <div className="flex flex-col items-center gap-5 text-center">
-              <span className="font-sans text-[12.5px] font-semibold uppercase tracking-[0.12em] text-accent-teal">How it works</span>
-              <h2 className="text-[34px] font-playfair font-normal leading-[1.14] tracking-[-0.025em] text-ink sm:text-[42px]">
-                Three steps to a packed event
-              </h2>
-            </div>
-            <div className="grid grid-cols-1 gap-10 md:grid-cols-3">
-              <div className="flex flex-col items-start gap-[13px]">
-                <span className="font-sans text-[12px] font-semibold tracking-[0.07em] text-accent-teal">01</span>
-                <h3 className="text-[20px] font-medium tracking-[-0.01em] text-ink">Publish the details</h3>
-                <p className="text-[15px] leading-[23px] text-ink-muted">Set a time, location, and capacity. Upload a flyer. Your event instantly appears in the centralized campus feed.</p>
+            <FadeIn y={10}>
+              <div className="flex flex-col items-center gap-5 text-center">
+                <span className="font-sans text-[12.5px] font-semibold uppercase tracking-[0.12em] text-accent-teal">How it works</span>
+                <h2 className="text-[34px] font-playfair font-normal leading-[1.14] tracking-[-0.025em] text-ink sm:text-[42px]">
+                  Three steps to a packed event
+                </h2>
               </div>
-              <div className="flex flex-col items-start gap-[13px]">
-                <span className="font-sans text-[12px] font-semibold tracking-[0.07em] text-accent-teal">02</span>
-                <h3 className="text-[20px] font-medium tracking-[-0.01em] text-ink">Gather RSVPs & Dues</h3>
-                <p className="text-[15px] leading-[23px] text-ink-muted">Students tap to RSVP or purchase tickets securely. You track real-time capacity and collected funds on your dashboard.</p>
-              </div>
-              <div className="flex flex-col items-start gap-[13px]">
-                <span className="font-sans text-[12px] font-semibold tracking-[0.07em] text-accent-teal">03</span>
-                <h3 className="text-[20px] font-medium tracking-[-0.01em] text-ink">Breeze through check-in</h3>
-                <p className="text-[15px] leading-[23px] text-ink-muted">Scan QR codes at the door with any smartphone. Turnout metrics automatically sync to your club's analytics.</p>
-              </div>
-            </div>
+            </FadeIn>
+            <StaggerContainer className="grid grid-cols-1 gap-6 md:grid-cols-3" delayChildren={0.2} staggerChildren={0.15}>
+              {[
+                { n: '01', title: 'Publish the details', body: 'Set a time, location, and capacity. Upload a flyer. Your event instantly appears in the centralized campus feed.' },
+                { n: '02', title: 'Gather RSVPs & Dues', body: 'Students tap to RSVP or purchase tickets securely. You track real-time capacity and collected funds on your dashboard.' },
+                { n: '03', title: 'Breeze through check-in', body: 'Scan QR codes at the door with any smartphone. Turnout metrics automatically sync to your club\'s analytics.' },
+              ].map(({ n, title, body }) => (
+                <StaggerItem key={n}>
+                  <div className="relative flex flex-col items-start gap-4 p-6 rounded-2xl border border-white/50 bg-white/65 backdrop-blur-[24px] shadow-[0_8px_24px_rgba(0,0,0,0.06),inset_0_1px_0_rgba(255,255,255,1)] overflow-hidden group hover:-translate-y-1 transition-transform duration-300">
+                    <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent pointer-events-none" />
+                    <span className="relative font-sans text-[13px] font-bold tracking-[0.08em] text-accent-teal">{n}</span>
+                    <h3 className="relative text-[20px] font-medium tracking-[-0.01em] text-ink">{title}</h3>
+                    <p className="relative text-[15px] leading-[23px] text-ink-muted">{body}</p>
+                  </div>
+                </StaggerItem>
+              ))}
+            </StaggerContainer>
           </div>
         </section>
 
         {/* FEATURES (ALTERNATING) */}
         <section id="features" className="flex scroll-mt-24 flex-col gap-24 overflow-x-clip px-6 pb-[104px] pt-20 lg:px-0">
-          
+
           {/* Feature 1 */}
           <div className="mx-auto flex max-w-[1200px] flex-col items-center gap-12 lg:gap-20 lg:flex-row">
-            <div className="w-full lg:w-[560px] lg:shrink-0 rounded-2xl overflow-hidden border border-border shadow-soft">
-              <div className="bg-surface-2 p-6">
-                <div className="relative h-[260px] sm:h-[300px] bg-white rounded-xl border border-border shadow-inner overflow-hidden flex flex-col">
+            <FadeIn scale={0.97} delay={0.1} className="w-full lg:w-[560px] lg:shrink-0 rounded-2xl overflow-hidden border border-white/50 shadow-[0_12px_40px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,1)] bg-white/60 backdrop-blur-[24px]">
+              <div className="bg-white/40 backdrop-blur-sm p-6">
+                <div className="relative h-[260px] sm:h-[300px] bg-white/80 backdrop-blur-md rounded-xl border border-white/60 shadow-inner overflow-hidden flex flex-col">
                   {/* Mock UI */}
-                  <div className="h-10 border-b border-border bg-surface-2 flex items-center px-4 gap-2">
+                  <div className="h-10 border-b border-border/30 bg-white/60 flex items-center px-4 gap-2">
                     <div className="w-3 h-3 rounded-full bg-red-400"></div>
                     <div className="w-3 h-3 rounded-full bg-amber-400"></div>
                     <div className="w-3 h-3 rounded-full bg-green-400"></div>
                   </div>
-                  <div className="p-4 flex-1 flex flex-col gap-3 bg-canvas">
-                    <div className="w-full h-24 bg-surface-2 rounded-lg border border-border"></div>
-                    <div className="w-full h-24 bg-surface-2 rounded-lg border border-border"></div>
-                    <div className="w-full h-24 bg-surface-2 rounded-lg border border-border"></div>
+                  <div className="p-4 flex-1 flex flex-col gap-3 bg-white/40 backdrop-blur-sm overflow-hidden">
+                    {/* Event Card 1 */}
+                    <div className="w-full bg-white/90 rounded-lg border border-white/60 shadow-sm p-3 flex gap-3">
+                      <div className="w-16 h-16 rounded-md bg-accent-teal/10 flex items-center justify-center shrink-0">
+                        <span className="text-[10px] font-bold text-accent-teal uppercase text-center leading-tight">Oct<br />24</span>
+                      </div>
+                      <div className="flex flex-col justify-center flex-1">
+                        <span className="text-[13px] font-bold text-ink leading-tight">Fall Rush Bonfire</span>
+                        <span className="text-[11px] text-ink-muted mt-0.5">Greek Council · Main Quad</span>
+                        <div className="flex items-center gap-1 mt-2">
+                          <div className="flex -space-x-1">
+                            <div className="w-4 h-4 rounded-full bg-primary/20 border border-white"></div>
+                            <div className="w-4 h-4 rounded-full bg-accent-teal/20 border border-white"></div>
+                            <div className="w-4 h-4 rounded-full bg-accent-gold/20 border border-white"></div>
+                          </div>
+                          <span className="text-[9px] text-ink-muted ml-1">+120 going</span>
+                        </div>
+                      </div>
+                    </div>
+                    {/* Event Card 2 */}
+                    <div className="w-full bg-white/90 rounded-lg border border-white/60 shadow-sm p-3 flex gap-3 opacity-60">
+                      <div className="w-16 h-16 rounded-md bg-accent-gold/10 flex items-center justify-center shrink-0">
+                        <span className="text-[10px] font-bold text-accent-gold uppercase text-center leading-tight">Oct<br />26</span>
+                      </div>
+                      <div className="flex flex-col justify-center flex-1">
+                        <span className="text-[13px] font-bold text-ink leading-tight">Tech Resume Review</span>
+                        <span className="text-[11px] text-ink-muted mt-0.5">Computer Science Club</span>
+                        <div className="flex items-center gap-1 mt-2">
+                          <span className="text-[9px] text-accent-teal font-medium bg-accent-teal/10 px-1.5 py-0.5 rounded">Free</span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-            <div className="flex flex-1 flex-col items-start gap-[18px]">
+            </FadeIn>
+            <FadeIn delay={0.2} className="flex flex-1 flex-col items-start gap-[18px]">
               <span className="font-sans text-[12px] font-semibold uppercase tracking-[0.08em] text-ink-muted">01 · Discovery</span>
               <h3 className="text-[26px] font-playfair font-medium leading-[1.2] tracking-[-0.02em] text-ink sm:text-[30px]">
-                A single feed for<br className="hidden sm:block"/> your entire campus
+                A single feed for<br className="hidden sm:block" /> your entire campus
               </h3>
               <p className="text-[17px] leading-[26px] text-ink-muted">
-                Stop relying on scattered flyers and chaotic group chats. ClubSync brings every event into one beautiful, personalized feed that students actually want to browse.
+                Stop relying on scattered flyers and chaotic group chats. EventFlow brings every event into one beautiful, personalized feed that students actually want to browse.
               </p>
-            </div>
+            </FadeIn>
           </div>
 
           {/* Feature 2 (Reversed) */}
           <div className="mx-auto flex max-w-[1200px] flex-col items-center gap-12 lg:gap-20 lg:flex-row-reverse">
-            <div className="w-full lg:w-[560px] lg:shrink-0 rounded-2xl overflow-hidden border border-border shadow-soft">
+            <FadeIn scale={0.97} delay={0.1} className="w-full lg:w-[560px] lg:shrink-0 rounded-2xl overflow-hidden border border-border shadow-soft">
               <div className="bg-surface-2 p-6">
                 <div className="relative h-[260px] sm:h-[300px] bg-primary rounded-xl border border-primary-hover shadow-inner overflow-hidden flex flex-col p-6">
                   {/* Mock UI */}
-                  <div className="flex items-center justify-between mb-6">
-                    <span className="text-white font-medium">Ticket Sales</span>
-                    <span className="text-white/60 text-sm">Last 7 days</span>
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="flex flex-col">
+                      <span className="text-white/80 text-sm font-medium">Net Revenue</span>
+                      <span className="text-white text-3xl font-playfair tracking-tight mt-1">$4,250.00</span>
+                    </div>
+                    <span className="bg-green-500/20 text-green-400 text-[11px] font-bold px-2 py-1 rounded-md flex items-center gap-1">
+                      +12.5%
+                    </span>
                   </div>
-                  <div className="flex-1 border-b border-l border-white/20 relative">
-                     {/* Fake Graph */}
-                     <div className="absolute bottom-0 w-full h-[60%] bg-accent-teal/20" style={{ clipPath: 'polygon(0 100%, 0 60%, 20% 50%, 40% 70%, 60% 40%, 80% 60%, 100% 20%, 100% 100%)' }}></div>
-                     <div className="absolute bottom-0 w-full h-[60%] border-t-2 border-accent-teal" style={{ clipPath: 'polygon(0 61%, 20% 51%, 40% 71%, 60% 41%, 80% 61%, 100% 21%, 100% 100%)' }}></div>
+                  <div className="flex-1 border-b border-l border-white/20 relative mt-4">
+                    {/* Fake Graph */}
+                    <div className="absolute bottom-0 w-full h-[60%] bg-accent-teal/20" style={{ clipPath: 'polygon(0 100%, 0 60%, 20% 50%, 40% 70%, 60% 40%, 80% 60%, 100% 20%, 100% 100%)' }}></div>
+                    <div className="absolute bottom-0 w-full h-[60%] border-t-2 border-accent-teal" style={{ clipPath: 'polygon(0 61%, 20% 51%, 40% 71%, 60% 41%, 80% 61%, 100% 21%, 100% 100%)' }}></div>
+                  </div>
+                  <div className="flex flex-col gap-2 mt-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center"><span className="text-white text-[10px]">JD</span></div>
+                        <span className="text-white/90 text-[12px]">John Doe</span>
+                      </div>
+                      <span className="text-white font-medium text-[12px]">+ $15.00</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center"><span className="text-white text-[10px]">AS</span></div>
+                        <span className="text-white/90 text-[12px]">Alice Smith</span>
+                      </div>
+                      <span className="text-white font-medium text-[12px]">+ $15.00</span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-            <div className="flex flex-1 flex-col items-start gap-[18px]">
-              <span className="font-sans text-[12px] font-semibold uppercase tracking-[0.08em] text-ink-muted">02 · Payments</span>
+            </FadeIn>
+            <FadeIn delay={0.2} className="flex flex-1 flex-col items-start gap-[18px]">
+              <span className="font-sans text-[12px] font-semibold uppercase tracking-[0.08em] text-ink-muted">02 · Management</span>
               <h3 className="text-[26px] font-playfair font-medium leading-[1.2] tracking-[-0.02em] text-ink sm:text-[30px]">
-                Collect dues and<br className="hidden sm:block"/> sell tickets securely
+                Manage RSVPs and<br className="hidden sm:block" /> collect dues securely
               </h3>
               <p className="text-[17px] leading-[26px] text-ink-muted">
-                Ditch the personal cash apps. Sell event tickets or collect semester dues through a unified platform, giving your treasurer real-time visibility into the budget.
+                Ditch the personal cash apps and chaotic spreadsheets. EventFlow gives your club a unified dashboard for real-time capacity tracking, secure ticketing, and post-event analytics.
               </p>
-            </div>
+            </FadeIn>
+          </div>
+
+          {/* Feature 3 */}
+          <div className="mx-auto flex max-w-[1200px] flex-col items-center gap-12 lg:gap-20 lg:flex-row">
+            <FadeIn scale={0.97} delay={0.1} className="w-full lg:w-[560px] lg:shrink-0 rounded-2xl overflow-hidden border border-white/50 shadow-[0_12px_40px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,1)] bg-white/60 backdrop-blur-[24px]">
+              <div className="bg-white/40 backdrop-blur-sm p-6">
+                <div className="relative h-[260px] sm:h-[300px] bg-[#0A1A17] rounded-xl border border-white/20 shadow-inner overflow-hidden flex flex-col items-center justify-center p-6">
+                  {/* Mock UI: Scanner */}
+                  <div className="absolute top-4 left-4 right-4 flex justify-between items-center">
+                    <span className="text-white/70 text-xs font-medium">Scanner Active</span>
+                    <span className="bg-green-500/20 text-green-400 text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+                      142 / 200
+                    </span>
+                  </div>
+
+                  {/* Viewfinder */}
+                  <div className="relative w-40 h-40 mt-4">
+                    <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-accent-teal"></div>
+                    <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-accent-teal"></div>
+                    <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-accent-teal"></div>
+                    <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-accent-teal"></div>
+
+                    {/* Scanning Line */}
+                    <div className="absolute top-1/2 left-0 w-full h-[2px] bg-accent-teal shadow-[0_0_10px_#27E0C0] animate-[scan_2s_ease-in-out_infinite] opacity-80" style={{ transform: 'translateY(-50%)' }}></div>
+                  </div>
+
+                  {/* Success Toast */}
+                  <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-4 py-2 flex items-center gap-3">
+                    <div className="w-6 h-6 rounded-full bg-green-500/20 flex items-center justify-center">
+                      <svg className="w-3.5 h-3.5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-white text-[12px] font-semibold leading-tight">Sarah Jenkins</span>
+                      <span className="text-white/60 text-[10px]">VIP Ticket</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </FadeIn>
+            <FadeIn delay={0.2} className="flex flex-1 flex-col items-start gap-[18px]">
+              <span className="font-sans text-[12px] font-semibold uppercase tracking-[0.08em] text-ink-muted">03 · Check-In</span>
+              <h3 className="text-[26px] font-playfair font-medium leading-[1.2] tracking-[-0.02em] text-ink sm:text-[30px]">
+                Breeze through the door<br className="hidden sm:block" /> with live QR scanning
+              </h3>
+              <p className="text-[17px] leading-[26px] text-ink-muted">
+                Turn any smartphone into a check-in scanner. EventFlow’s live console prevents duplicate entries and keeps your door line moving fast, all while syncing turnout metrics instantly.
+              </p>
+            </FadeIn>
+          </div>
+
+          {/* Feature 4 (Reversed) */}
+          <div className="mx-auto flex max-w-[1200px] flex-col items-center gap-12 lg:gap-20 lg:flex-row-reverse">
+            <FadeIn scale={0.97} delay={0.1} className="w-full lg:w-[560px] lg:shrink-0 rounded-2xl overflow-hidden border border-border shadow-soft">
+              <div className="bg-surface-2 p-6">
+                <div className="relative h-[260px] sm:h-[300px] bg-white rounded-xl border border-border shadow-inner overflow-hidden flex flex-col">
+                  {/* Mock UI: Club Profile */}
+                  <div className="h-28 w-full bg-gradient-to-r from-accent-teal/20 to-primary/20 relative">
+                    <div className="absolute -bottom-8 left-6 w-16 h-16 rounded-xl bg-white border border-border shadow-sm flex items-center justify-center">
+                      <span className="text-primary font-playfair font-bold text-2xl">D</span>
+                    </div>
+                  </div>
+                  <div className="pt-10 px-6 pb-4">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h4 className="text-lg font-bold text-ink leading-tight">Debate Society</h4>
+                        <span className="text-[11px] text-ink-muted">@debatesociety · 450 Followers</span>
+                      </div>
+                      <span className="bg-primary text-white text-[10px] font-medium px-3 py-1.5 rounded-full">Follow</span>
+                    </div>
+
+                    {/* Tabs */}
+                    <div className="flex gap-4 mt-6 border-b border-border">
+                      <span className="text-[12px] font-semibold text-primary border-b-2 border-primary pb-2">Upcoming Events</span>
+                      <span className="text-[12px] font-medium text-ink-muted pb-2">Announcements</span>
+                    </div>
+
+                    {/* Event Snippet */}
+                    <div className="mt-4 flex gap-3 items-center">
+                      <div className="w-12 h-12 rounded-lg bg-surface-2 flex flex-col items-center justify-center border border-border">
+                        <span className="text-[9px] uppercase font-bold text-accent-teal">Nov</span>
+                        <span className="text-[14px] font-bold text-ink leading-tight">12</span>
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-[13px] font-bold text-ink">Fall Intercollegiate Debate</span>
+                        <span className="text-[11px] text-ink-muted">Student Union · 6:00 PM</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </FadeIn>
+            <FadeIn delay={0.2} className="flex flex-1 flex-col items-start gap-[18px]">
+              <span className="font-sans text-[12px] font-semibold uppercase tracking-[0.08em] text-ink-muted">04 · Community</span>
+              <h3 className="text-[26px] font-playfair font-medium leading-[1.2] tracking-[-0.02em] text-ink sm:text-[30px]">
+                Your club's digital<br className="hidden sm:block" /> home on campus
+              </h3>
+              <p className="text-[17px] leading-[26px] text-ink-muted">
+                Build your brand with a beautiful club profile. Manage roles, broadcast announcements directly to followers, and give members a central hub to connect.
+              </p>
+            </FadeIn>
           </div>
 
         </section>
 
         {/* GUARDRAILS / SECURITY (DARK) */}
         <section id="security" className="flex scroll-mt-24 flex-col items-center gap-11 bg-primary px-6 py-[100px] lg:px-0 relative w-full left-1/2 right-1/2 -ml-[50vw] -mr-[50vw]">
-          <div className="flex flex-col items-center gap-[18px] text-center max-w-4xl mx-auto">
+          <FadeIn y={10} className="flex flex-col items-center gap-[18px] text-center max-w-4xl mx-auto">
             <span className="font-sans text-[12.5px] font-semibold uppercase tracking-[0.12em] text-accent-teal">Security</span>
             <h2 className="text-[34px] font-playfair font-normal leading-[1.14] tracking-[-0.025em] text-white sm:text-[42px]">
-              Trust and privacy,<br className="hidden sm:block"/> by default
+              Trust and privacy,<br className="hidden sm:block" /> by default
             </h2>
             <p className="max-w-[600px] text-[17px] leading-[27px] text-white/70 sm:text-[18px]">
               Control who sees what. Keep internal club meetings private for verified members, and broadcast your major events to the entire campus safely.
             </p>
-          </div>
+          </FadeIn>
 
-          <div className="grid w-full max-w-[860px] grid-cols-2 gap-x-8 gap-y-7 border-t border-white/10 pt-[30px] lg:grid-cols-4 mx-auto">
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-2 text-accent-teal">
-                <ShieldCheck className="w-4 h-4" />
-                <span className="text-[15px] font-medium text-white">Verified Emails</span>
+          <StaggerContainer className="grid w-full max-w-[860px] grid-cols-2 gap-x-8 gap-y-7 border-t border-white/10 pt-[30px] lg:grid-cols-4 mx-auto" delayChildren={0.2} staggerChildren={0.1}>
+            <StaggerItem>
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-2 text-accent-teal">
+                  <ShieldCheck className="w-4 h-4" />
+                  <span className="text-[15px] font-medium text-white">Verified Emails</span>
+                </div>
+                <span className="font-sans text-[11.5px] leading-[17px] text-white/60">Strict `.edu` domain verification required.</span>
               </div>
-              <span className="font-sans text-[11.5px] leading-[17px] text-white/60">Strict `.edu` domain verification required.</span>
-            </div>
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-2 text-accent-teal">
-                <Users className="w-4 h-4" />
-                <span className="text-[15px] font-medium text-white">Private Events</span>
+            </StaggerItem>
+            <StaggerItem>
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-2 text-accent-teal">
+                  <Users className="w-4 h-4" />
+                  <span className="text-[15px] font-medium text-white">Role Access</span>
+                </div>
+                <span className="font-sans text-[11.5px] leading-[17px] text-white/60">Admin, treasurer, and member permission levels.</span>
               </div>
-              <span className="font-sans text-[11.5px] leading-[17px] text-white/60">Restrict visibility to approved members.</span>
-            </div>
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-2 text-accent-teal">
-                <CreditCard className="w-4 h-4" />
-                <span className="text-[15px] font-medium text-white">Secure Payments</span>
+            </StaggerItem>
+            <StaggerItem>
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-2 text-accent-teal">
+                  <LayoutDashboard className="w-4 h-4" />
+                  <span className="text-[15px] font-medium text-white">Private Events</span>
+                </div>
+                <span className="font-sans text-[11.5px] leading-[17px] text-white/60">Hide meetings from the public campus feed.</span>
               </div>
-              <span className="font-sans text-[11.5px] leading-[17px] text-white/60">Bank-level encryption for all transactions.</span>
-            </div>
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-2 text-accent-teal">
-                <LayoutDashboard className="w-4 h-4" />
-                <span className="text-[15px] font-medium text-white">Admin Controls</span>
+            </StaggerItem>
+            <StaggerItem>
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-2 text-accent-teal">
+                  <CreditCard className="w-4 h-4" />
+                  <span className="text-[15px] font-medium text-white">Secure Payouts</span>
+                </div>
+                <span className="font-sans text-[11.5px] leading-[17px] text-white/60">PCI-compliant transactions and direct deposit.</span>
               </div>
-              <span className="font-sans text-[11.5px] leading-[17px] text-white/60">Manage permissions across officers.</span>
-            </div>
-          </div>
+            </StaggerItem>
+          </StaggerContainer>
         </section>
 
         {/* REGISTRY / SOCIAL PROOF */}
-        <section id="registry" className="flex scroll-mt-24 flex-col gap-11 px-6 py-[100px] lg:px-0 max-w-[1200px] mx-auto w-full">
+        <section id="registry" className="flex scroll-mt-24 flex-col gap-11 px-6 pt-[100px] pb-16 lg:px-0 max-w-[1200px] mx-auto w-full">
           <div className="w-full">
             <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-end">
               <h2 className="max-w-[520px] text-[26px] font-playfair font-normal leading-[1.2] tracking-[-0.02em] text-ink sm:text-[30px]">
-                Student leaders are already building their communities here
+                Empowering student leaders to build better communities
               </h2>
             </div>
           </div>
-          
-          {/* Logos Row */}
-          <div className="flex w-full flex-wrap items-center justify-between gap-6">
-            <span className="text-[20px] text-ink-subtle hover:text-ink-muted transition-colors duration-200 font-sans font-semibold">Stanford</span>
-            <span className="text-[20px] text-ink-subtle hover:text-ink-muted transition-colors duration-200 font-playfair font-semibold">Harvard</span>
-            <span className="text-[20px] text-ink-subtle hover:text-ink-muted transition-colors duration-200 font-sans font-bold uppercase tracking-widest">MIT</span>
-            <span className="text-[20px] text-ink-subtle hover:text-ink-muted transition-colors duration-200 font-sans font-medium">UCLA</span>
-            <span className="text-[20px] text-ink-subtle hover:text-ink-muted transition-colors duration-200 font-sans font-semibold">NYU</span>
-          </div>
-          
-          {/* Testimonial & Stat Grid */}
-          <div className="grid w-full grid-cols-1 gap-6 lg:grid-cols-[1.5fr_1fr]">
-            <figure className="flex h-full flex-col justify-between gap-7 border border-border bg-white p-[34px] rounded-2xl shadow-sm">
-              <blockquote className="text-[22px] font-normal leading-[1.45] tracking-[-0.015em] text-ink sm:text-[23px]">
-                “ClubSync completely changed how we handle rush week. We went from messy spreadsheets to a seamless QR system in an afternoon.”
-              </blockquote>
-              <figcaption className="flex items-center gap-3">
-                <span className="flex h-10 w-10 items-center justify-center bg-primary text-[14px] font-semibold text-white rounded-full">AR</span>
-                <span className="flex flex-col">
-                  <span className="text-[15px] font-semibold text-ink">Alex Rivera</span>
-                  <span className="text-[14px] text-ink-muted">President, Debate Society</span>
-                </span>
-              </figcaption>
-            </figure>
-            <div className="flex h-full flex-col justify-between gap-7 overflow-hidden bg-accent-teal p-[34px] rounded-2xl shadow-soft">
-              <span className="font-sans text-[11.5px] font-semibold uppercase tracking-[0.1em] text-white/80">Platform Scale</span>
-              <div className="flex flex-col gap-2.5">
-                <span className="text-[64px] font-playfair font-medium leading-none tracking-[-0.03em] text-white sm:text-[72px]">1.2M</span>
-                <span className="max-w-[230px] text-[17px] leading-[24px] text-white/90">students reached across nationwide campuses.</span>
-              </div>
-              <div className="flex flex-col gap-7">
-                <div className="h-px w-full bg-white/30"></div>
-                <div className="flex items-start gap-7">
-                  <div className="flex flex-col gap-[3px]">
-                    <span className="font-sans text-[19px] font-semibold text-white">45k+</span>
-                    <span className="font-sans text-[11px] uppercase tracking-[0.04em] text-white/80">events</span>
+
+          {/* Mission & Roles Grid */}
+          <StaggerContainer className="grid w-full grid-cols-1 gap-6 lg:grid-cols-2 mt-4" delayChildren={0.2} staggerChildren={0.2}>
+            <StaggerItem className="h-full">
+              <figure className="relative flex h-full flex-col justify-between gap-7 rounded-2xl border border-white/50 bg-white/65 backdrop-blur-[28px] p-[34px] shadow-[0_8px_32px_rgba(0,0,0,0.06),inset_0_1.5px_0_rgba(255,255,255,1)] overflow-hidden">
+                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-b from-white/25 to-transparent pointer-events-none" />
+                <div className="relative">
+                  <span className="font-sans text-[11.5px] font-semibold uppercase tracking-[0.1em] text-accent-teal">Our Mission</span>
+                  <p className="mt-4 text-[22px] font-normal leading-[1.45] tracking-[-0.015em] text-ink sm:text-[23px]">
+                    To eliminate the friction of campus event organization. EventFlow gives every club the professional tools they need to focus on what matters: building community.
+                  </p>
+                </div>
+              </figure>
+            </StaggerItem>
+            <StaggerItem className="h-full">
+              <div className="flex h-full flex-col justify-center gap-7 overflow-hidden bg-accent-teal p-[34px] rounded-2xl shadow-soft">
+                <span className="font-sans text-[11.5px] font-semibold uppercase tracking-[0.1em] text-white/80">Built for Everyone</span>
+                <div className="flex flex-col gap-6 mt-1">
+                  <div>
+                    <h4 className="text-lg font-semibold text-white">For Students</h4>
+                    <p className="text-[15px] leading-relaxed text-white/80 mt-1">Discover what's happening on campus, RSVP with a tap, and keep your QR tickets in one place.</p>
                   </div>
-                  <div className="flex flex-col gap-[3px]">
-                    <span className="font-sans text-[19px] font-semibold text-white">120+</span>
-                    <span className="font-sans text-[11px] uppercase tracking-[0.04em] text-white/80">colleges</span>
+                  <div className="h-px w-full bg-white/30"></div>
+                  <div>
+                    <h4 className="text-lg font-semibold text-white">For Organizers</h4>
+                    <p className="text-[15px] leading-relaxed text-white/80 mt-1">Create events, track capacity, sell tickets, scan check-ins, and analyze turnout all from one dashboard.</p>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
+            </StaggerItem>
+          </StaggerContainer>
         </section>
 
         {/* CTA / PRICING SECTION */}
-        <section className="flex flex-col items-center gap-[26px] px-6 pb-[130px] pt-[80px] text-center lg:px-0">
+        <section className="flex flex-col items-center gap-6 px-6 pb-16 pt-12 text-center lg:px-0">
           <h2 className="text-[40px] font-playfair font-normal leading-[1.08] tracking-[-0.03em] text-ink sm:text-[54px]">
-            Upgrade your club in<br/>under <span className="font-medium text-accent-teal">ten minutes</span>
+            Upgrade your club in<br />under <span className="font-medium text-accent-teal">ten minutes</span>
           </h2>
           <p className="max-w-[520px] text-[18px] leading-[28px] text-ink-muted sm:text-[19px]">
-            Join thousands of students and clubs already using ClubSync to make campus life better, simpler, and more connected.
+            Join the student leaders already using EventFlow to make campus life better, simpler, and more connected.
           </p>
           <div className="flex flex-col items-center gap-3.5 pt-1.5 sm:flex-row">
             <Link href="/signup">
-              <button className="bg-primary px-6 py-[15px] text-[16px] font-medium text-white transition-transform duration-200 hover:-translate-y-0.5 rounded-lg shadow-soft-sm hover:bg-primary-hover">
+              <button className="relative overflow-hidden rounded-xl bg-primary/95 backdrop-blur-md border border-white/15 px-8 py-[15px] text-[16px] font-medium text-white shadow-[0_4px_20px_rgba(13,59,56,0.35),inset_0_1px_0_rgba(255,255,255,0.2)] transition-all duration-200 hover:bg-primary hover:scale-[1.02] hover:shadow-[0_8px_32px_rgba(13,59,56,0.4)]">
+                <span className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent" />
                 Get Started for Free
               </button>
             </Link>
             <Link href="/demo">
-              <button className="group flex items-center gap-2 border border-border bg-white px-6 py-[15px] text-[16px] font-medium text-ink transition-colors hover:border-ink/30 rounded-lg shadow-sm">
+              <button className="relative overflow-hidden rounded-xl border border-white/60 bg-white/70 backdrop-blur-[28px] px-8 py-[15px] text-[16px] font-medium text-ink shadow-[0_4px_16px_rgba(0,0,0,0.07),inset_0_1px_0_rgba(255,255,255,1)] transition-all duration-200 hover:bg-white/80 hover:scale-[1.02]">
+                <span className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white to-transparent" />
                 Book a Demo
               </button>
             </Link>

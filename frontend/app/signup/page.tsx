@@ -53,7 +53,7 @@ export default function SignupPage() {
   }
 
   return (
-    <PublicLayout hideFooter={true}>
+    <PublicLayout hideFooter hideNav>
       <div className="flex-1 flex min-h-[calc(100vh-4rem)] md:flex-row-reverse">
         {/* Left Side: Form */}
         <div className="w-full md:w-1/2 flex items-center justify-center p-8 lg:p-16 bg-white">
