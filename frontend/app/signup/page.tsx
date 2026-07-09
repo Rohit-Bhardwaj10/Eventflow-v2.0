@@ -53,132 +53,146 @@ export default function SignupPage() {
   }
 
   return (
-    <PublicLayout>
-      <div className="flex-1 flex items-center justify-center px-6 py-16">
-        <Card variant="default" className="w-full max-w-md relative">
-          <Badge variant="cyan" className="absolute -top-3 -right-3 -rotate-2">
-            New account
-          </Badge>
-
-          <div className="flex flex-col items-center mb-8 pt-2">
-            <div className="h-12 w-12 bg-primary border-[2px] border-border shadow-brutal-sm flex items-center justify-center mb-6">
-              <Zap className="h-6 w-6 text-ink" />
+    <PublicLayout hideFooter={true}>
+      <div className="flex-1 flex min-h-[calc(100vh-4rem)] md:flex-row-reverse">
+        {/* Left Side: Form */}
+        <div className="w-full md:w-1/2 flex items-center justify-center p-8 lg:p-16 bg-white">
+          <div className="w-full max-w-md">
+            <div className="mb-8">
+              <h1 className="font-serif text-4xl lg:text-5xl text-slate-900 mb-2">Create Account</h1>
+              <p className="text-slate-500 font-sans">
+                Join your campus on Eventflow.
+              </p>
             </div>
-            <h1 className="text-headline uppercase text-ink mb-2">Create your account</h1>
-            <p className="text-body-sm text-ink-muted text-center">
-              Join your campus on Eventflow.
-            </p>
-          </div>
 
-          {error && (
-            <div className="mb-5 border-[2px] border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-400 font-semibold">
-              {error}
-            </div>
-          )}
+            {error && (
+              <div className="mb-6 rounded-xl border border-red-200 bg-red-50/50 px-4 py-3 text-sm text-red-600">
+                {error}
+              </div>
+            )}
 
-          <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
-            <div className="flex flex-col gap-2">
-              <label htmlFor="name" className="text-caption text-ink">
-                Full Name
-              </label>
-              <Input
-                id="name"
-                type="text"
-                placeholder="Aarav Mehta"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
+            <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
+              <div className="flex flex-col gap-2">
+                <label htmlFor="name" className="text-sm font-medium text-slate-700">
+                  Full Name
+                </label>
+                <Input
+                  id="name"
+                  type="text"
+                  placeholder="Aarav Mehta"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                  disabled={loading}
+                  className="rounded-xl border-slate-200 shadow-sm focus:border-slate-400 focus:ring-slate-400 transition-all"
+                />
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label htmlFor="email" className="text-sm font-medium text-slate-700">
+                  College Email
+                </label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="student@college.edu"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  disabled={loading}
+                  className="rounded-xl border-slate-200 shadow-sm focus:border-slate-400 focus:ring-slate-400 transition-all"
+                />
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label htmlFor="year" className="text-sm font-medium text-slate-700">
+                  Academic Year <span className="text-slate-400 font-normal">(optional)</span>
+                </label>
+                <select
+                  id="year"
+                  value={year}
+                  onChange={(e) => setYear(e.target.value)}
+                  disabled={loading}
+                  className="w-full h-10 px-3 py-2 rounded-xl border border-slate-200 bg-white text-sm text-slate-900 shadow-sm focus:outline-none focus:border-slate-400 focus:ring-1 focus:ring-slate-400 transition-all"
+                >
+                  <option value="">Select year</option>
+                  <option value="1">1st Year</option>
+                  <option value="2">2nd Year</option>
+                  <option value="3">3rd Year</option>
+                  <option value="4">4th Year</option>
+                  <option value="5">5th Year</option>
+                </select>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label htmlFor="password" className="text-sm font-medium text-slate-700">
+                  Password
+                </label>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="Min. 8 characters"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  disabled={loading}
+                  className="rounded-xl border-slate-200 shadow-sm focus:border-slate-400 focus:ring-slate-400 transition-all"
+                />
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label htmlFor="confirm" className="text-sm font-medium text-slate-700">
+                  Confirm Password
+                </label>
+                <Input
+                  id="confirm"
+                  type="password"
+                  placeholder="••••••••"
+                  value={confirm}
+                  onChange={(e) => setConfirm(e.target.value)}
+                  required
+                  disabled={loading}
+                  className="rounded-xl border-slate-200 shadow-sm focus:border-slate-400 focus:ring-slate-400 transition-all"
+                />
+              </div>
+
+              <Button 
+                variant="default" 
+                className="mt-4 w-full rounded-xl bg-slate-900 text-white hover:bg-slate-800 shadow-lg shadow-slate-900/20" 
+                size="lg" 
                 disabled={loading}
-              />
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <label htmlFor="email" className="text-caption text-ink">
-                College Email
-              </label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="student@college.edu"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                disabled={loading}
-              />
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <label htmlFor="year" className="text-caption text-ink">
-                Academic Year <span className="text-ink-muted normal-case font-normal">(optional)</span>
-              </label>
-              <select
-                id="year"
-                value={year}
-                onChange={(e) => setYear(e.target.value)}
-                disabled={loading}
-                className="border-[2px] border-border bg-canvas text-ink px-4 py-3 text-sm font-semibold focus:outline-none focus:border-primary transition-colors"
               >
-                <option value="">Select year</option>
-                <option value="1">1st Year</option>
-                <option value="2">2nd Year</option>
-                <option value="3">3rd Year</option>
-                <option value="4">4th Year</option>
-                <option value="5">5th Year</option>
-              </select>
+                {loading ? (
+                  <span className="flex items-center gap-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Creating account…
+                  </span>
+                ) : (
+                  'Create Account'
+                )}
+              </Button>
+            </form>
+
+            <div className="mt-8 text-center text-sm text-slate-500">
+              Already have an account?{' '}
+              <Link
+                href="/login"
+                className="font-medium text-slate-900 hover:underline underline-offset-4 transition-all"
+              >
+                Log in
+              </Link>
             </div>
-
-            <div className="flex flex-col gap-2">
-              <label htmlFor="password" className="text-caption text-ink">
-                Password
-              </label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="Min. 8 characters"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                disabled={loading}
-              />
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <label htmlFor="confirm" className="text-caption text-ink">
-                Confirm Password
-              </label>
-              <Input
-                id="confirm"
-                type="password"
-                placeholder="••••••••"
-                value={confirm}
-                onChange={(e) => setConfirm(e.target.value)}
-                required
-                disabled={loading}
-              />
-            </div>
-
-            <Button variant="primary" className="mt-2 w-full" size="lg" disabled={loading}>
-              {loading ? (
-                <span className="flex items-center gap-2">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Creating account…
-                </span>
-              ) : (
-                'Create Account →'
-              )}
-            </Button>
-          </form>
-
-          <div className="mt-8 text-center text-body-sm text-ink-muted">
-            Already have an account?{' '}
-            <Link
-              href="/login"
-              className="text-ink font-bold underline underline-offset-4 hover:text-primary"
-            >
-              Log in
-            </Link>
           </div>
-        </Card>
+        </div>
+
+        {/* Right Side: Image */}
+        <div className="hidden md:block w-1/2 relative bg-slate-100">
+          <div 
+            className="absolute inset-0 bg-cover bg-center"
+            style={{ backgroundImage: 'url("/AI_Bg_039.png")' }}
+          >
+          </div>
+        </div>
       </div>
     </PublicLayout>
   );

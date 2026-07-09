@@ -31,6 +31,23 @@ export class JwtAuthGuard implements CanActivate {
     const request = context.switchToHttp().getRequest<Request>();
     const token = this.extractTokenFromHeader(request);
 
+    // DEV OVERRIDE: Skip login in development
+    if (process.env.NODE_ENV !== 'production' && !token) {
+      const devUser = await this.prisma.user.findFirst();
+      if (devUser) {
+        const { passwordHash, ...safeUser } = devUser as any;
+        request['user'] = safeUser;
+      } else {
+        request['user'] = {
+          id: 'dev-user-id',
+          email: 'dev@example.com',
+          name: 'Dev User',
+          role: 'ADMIN',
+        };
+      }
+      return true;
+    }
+
     if (!token) {
       throw new UnauthorizedException('No authentication token provided');
     }
