@@ -1,28 +1,24 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
-import { Button } from '@/components/ui/button';
 
 export function PublicLayout({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen flex flex-col bg-canvas text-ink">
-      <div className="fixed top-5 left-0 right-0 z-50 px-4 flex justify-center pointer-events-none">
-        <header className="pointer-events-auto flex w-full max-w-6xl items-center justify-between gap-4 rounded-none border-[2px] border-border bg-surface-1/82 px-4 py-3 shadow-[0_16px_50px_rgba(0,0,0,0.28)] backdrop-blur-xl md:px-6">
+      <div className="fixed top-6 left-0 right-0 z-50 px-4 flex justify-center pointer-events-none">
+        <header className="pointer-events-auto flex w-full max-w-5xl items-center justify-between gap-4 rounded-full border border-white/20 bg-white/40 px-4 py-3 shadow-[0_8px_32px_rgba(0,0,0,0.08),inset_0_1px_1px_rgba(255,255,255,0.6)] backdrop-blur-2xl backdrop-saturate-150 md:px-6 transition-all duration-300">
           <div className="flex items-center gap-8">
             <Link href="/" className="flex items-center gap-3 group">
-              <div className="flex h-10 w-10 items-center justify-center border-[2px] border-border bg-primary text-ink shadow-brutal-sm transition-transform group-hover:-translate-y-0.5">
-                <span className="text-sm font-black">EF</span>
-              </div>
+              {/* <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-white shadow-soft-sm transition-transform group-hover:-translate-y-0.5">
+                <span className="text-lg font-semibold font-playfair italic"></span>
+              </div> */}
               <div className="leading-tight">
-                <span className="block text-sm font-black uppercase tracking-[0.18em]">
-                  Eventflow
-                </span>
-                <span className="block text-[11px] uppercase tracking-[0.22em] text-ink-muted">
-                  Campus operations
+                <span className="block text-[15px] font-semibold text-primary tracking-tight">
+                  ClubSync
                 </span>
               </div>
             </Link>
 
-            <nav className="hidden lg:flex items-center gap-1 text-sm font-semibold uppercase tracking-[0.16em] text-ink-muted">
+            <nav className="hidden lg:flex items-center gap-2 text-[13px] font-medium text-ink-muted">
               {[
                 { href: '/#features', label: 'Features' },
                 { href: '/#workflow', label: 'Workflow' },
@@ -32,7 +28,7 @@ export function PublicLayout({ children }: { children: ReactNode }) {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="rounded-none border border-transparent px-3 py-2 transition-colors hover:border-border hover:bg-surface-2 hover:text-ink"
+                  className="rounded-full px-4 py-2 transition-all hover:bg-white/80 hover:text-primary hover:shadow-soft-sm"
                 >
                   {link.label}
                 </Link>
@@ -42,14 +38,14 @@ export function PublicLayout({ children }: { children: ReactNode }) {
 
           <div className="flex items-center gap-2 sm:gap-3">
             <Link href="/login" className="hidden sm:block">
-              <Button variant="secondary" size="default">
+              <button className="px-4 py-2 text-sm font-medium text-ink-muted hover:text-primary transition-colors">
                 Log in
-              </Button>
+              </button>
             </Link>
             <Link href="/signup">
-              <Button variant="primary" size="default">
+              <button className="rounded-full bg-primary px-5 py-2 text-sm font-medium text-white shadow-soft-sm transition-transform hover:-translate-y-0.5 hover:bg-primary-hover">
                 Start free
-              </Button>
+              </button>
             </Link>
           </div>
         </header>
@@ -57,23 +53,22 @@ export function PublicLayout({ children }: { children: ReactNode }) {
 
       <main className="flex-1 flex flex-col">{children}</main>
 
-      <footer className="border-t-[2px] border-border bg-surface-1 text-ink">
-        <div className="mx-auto grid max-w-6xl grid-cols-1 gap-10 px-6 py-14 md:grid-cols-12">
-          <div className="md:col-span-5 flex flex-col gap-5">
+      <footer className="border-t border-border/60 bg-surface-1 text-ink">
+        <div className="mx-auto grid max-w-5xl grid-cols-1 gap-10 px-6 py-16 md:grid-cols-12">
+          <div className="md:col-span-5 flex flex-col gap-6">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center border-[2px] border-border bg-primary text-ink shadow-brutal-sm">
-                <span className="text-sm font-black">EF</span>
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-white shadow-soft-sm">
+                <span className="text-lg font-semibold font-playfair italic">C</span>
               </div>
               <div>
-                <p className="text-sm font-black uppercase tracking-[0.18em]">Eventflow</p>
-                <p className="text-[11px] uppercase tracking-[0.22em] text-ink-muted">
-                  Built for campus organizers
+                <p className="text-[15px] font-semibold text-primary tracking-tight">ClubSync</p>
+                <p className="text-xs font-medium text-ink-muted mt-0.5">
+                  Campus Events, Simplified.
                 </p>
               </div>
             </div>
-            <p className="max-w-md text-sm leading-6 text-ink-muted">
-              A modern operations layer for clubs and event teams: publish, ticket,
-              check in, measure, and follow up without spreadsheet drift.
+            <p className="max-w-md text-sm leading-relaxed text-ink-muted">
+              Discover events, manage clubs, and never miss what&apos;s happening on campus. A modern operations layer for student leaders.
             </p>
           </div>
 
@@ -105,9 +100,9 @@ export function PublicLayout({ children }: { children: ReactNode }) {
           </div>
         </div>
 
-        <div className="border-t border-border/80 bg-canvas">
-          <div className="mx-auto flex max-w-6xl flex-col gap-3 px-6 py-5 text-[11px] uppercase tracking-[0.22em] text-ink-muted sm:flex-row sm:items-center sm:justify-between">
-            <span>© 2026 Eventflow</span>
+        <div className="border-t border-border/40 bg-canvas/50">
+          <div className="mx-auto flex max-w-5xl flex-col gap-3 px-6 py-6 text-xs font-medium text-ink-subtle sm:flex-row sm:items-center sm:justify-between">
+            <span>© 2026 ClubSync</span>
             <span>Campus event management</span>
           </div>
         </div>
@@ -124,8 +119,8 @@ function FooterColumn({
   links: { href: string; label: string }[];
 }) {
   return (
-    <div className="flex flex-col gap-4">
-      <h4 className="text-[11px] font-black uppercase tracking-[0.24em] text-primary">
+    <div className="flex flex-col gap-5">
+      <h4 className="text-xs font-semibold uppercase tracking-wider text-primary">
         {title}
       </h4>
       {links.map((link) => (

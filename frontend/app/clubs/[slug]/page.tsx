@@ -11,9 +11,6 @@ import {
   ArrowLeft,
   Users,
   Globe,
-  Instagram,
-  Twitter,
-  Linkedin,
   Loader2,
   CalendarDays,
   CheckCircle2,
@@ -247,7 +244,7 @@ export default function ClubDetailPage() {
             </div>
 
             {/* Social links */}
-            {(club.website || club.instagram || club.twitter || club.linkedin) && (
+            {(club.website || club.instagram || club.twitter) && (
               <div className="border-[2px] border-border bg-surface-1 p-5">
                 <p className="text-[10px] font-black uppercase tracking-[0.2em] text-ink-muted mb-3">Links</p>
                 <div className="flex flex-col gap-2">
@@ -260,19 +257,13 @@ export default function ClubDetailPage() {
                   {club.instagram && (
                     <a href={`https://instagram.com/${club.instagram}`} target="_blank" rel="noopener noreferrer"
                       className="flex items-center gap-2 text-sm text-ink-muted hover:text-ink transition-colors">
-                      <Instagram className="h-4 w-4" /> @{club.instagram}
+                      <Globe className="h-4 w-4" /> @{club.instagram}
                     </a>
                   )}
                   {club.twitter && (
                     <a href={`https://twitter.com/${club.twitter}`} target="_blank" rel="noopener noreferrer"
                       className="flex items-center gap-2 text-sm text-ink-muted hover:text-ink transition-colors">
-                      <Twitter className="h-4 w-4" /> @{club.twitter}
-                    </a>
-                  )}
-                  {club.linkedin && (
-                    <a href={club.linkedin} target="_blank" rel="noopener noreferrer"
-                      className="flex items-center gap-2 text-sm text-ink-muted hover:text-ink transition-colors">
-                      <Linkedin className="h-4 w-4" /> LinkedIn
+                      <Globe className="h-4 w-4" /> @{club.twitter}
                     </a>
                   )}
                 </div>

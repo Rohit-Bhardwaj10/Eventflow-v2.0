@@ -4,520 +4,400 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import {
-  ArrowRight,
-  BarChart3,
-  BadgeCheck,
-  CalendarDays,
   CheckCircle2,
-  CreditCard,
-  FileCheck2,
-  Megaphone,
-  MessageSquareQuote,
-  Radar,
-  ScanLine,
+  Users,
+  Star,
+  UsersRound,
   ShieldCheck,
-  Sparkles,
-  Ticket,
+  CreditCard,
+  QrCode,
+  LineChart,
+  LayoutDashboard
 } from 'lucide-react';
 import type { ReactNode } from 'react';
-
 import { PublicLayout } from '@/components/layouts/public-layout';
-import { HeroScene } from '@/components/landing/hero-scene';
-
-const stats = [
-  { value: '3x', label: 'faster setup' },
-  { value: '99.9%', label: 'scan reliability' },
-  { value: '1', label: 'workspace' },
-];
 
 const features = [
   {
-    icon: Ticket,
-    title: 'Ticketing that stays tidy',
-    description:
-      'Create public or private ticket tiers, manage capacity, and keep the experience simple for attendees.',
+    icon: LayoutDashboard,
+    title: 'Event Discovery',
+    description: 'A beautiful, centralized calendar for students to find and RSVP to everything happening on campus.',
   },
   {
-    icon: ScanLine,
-    title: 'Fast QR check-in',
-    description:
-      'Move entry from a bottleneck to a quick scan with a clear live view for the team at the door.',
+    icon: UsersRound,
+    title: 'Club Management',
+    description: 'Manage members, track dues, and organize your roster all in one secure place.',
   },
   {
-    icon: BarChart3,
-    title: 'Operational analytics',
-    description:
-      'See registrations, attendance, and conversion in one dashboard instead of stitching reports together.',
+    icon: QrCode,
+    title: 'QR Check-in',
+    description: 'Breeze through long lines with instant mobile QR scanning for registered attendees.',
   },
   {
-    icon: Megaphone,
-    title: 'Announcements and outreach',
-    description:
-      'Send updates, reminders, and follow-ups without leaving the event workflow.',
+    icon: CreditCard,
+    title: 'Payments & Dues',
+    description: 'Sell tickets securely and collect club dues without third-party cash apps.',
   },
   {
-    icon: FileCheck2,
-    title: 'Certificates and records',
-    description:
-      'Keep attendance records and post-event certificates attached to the same source of truth.',
+    icon: LineChart,
+    title: 'Analytics & Insights',
+    description: 'Understand what works with real-time turnout metrics and engagement tracking.',
   },
   {
     icon: ShieldCheck,
-    title: 'Controlled access',
-    description:
-      'Separate organizers, volunteers, and admins so the right people see the right controls.',
-  },
+    title: 'Secure Access',
+    description: 'Control who sees what. Keep internal club meetings private and open events public.',
+  }
 ];
 
-const workflow = [
-  {
-    step: '01',
-    title: 'Plan the event',
-    description:
-      'Set the event details, pricing, attendee limits, and communications from a single workspace.',
-    icon: CalendarDays,
-  },
-  {
-    step: '02',
-    title: 'Publish and collect',
-    description:
-      'Share the event, sell tickets, and track signups while the dashboard keeps the numbers current.',
-    icon: CreditCard,
-  },
-  {
-    step: '03',
-    title: 'Operate on the day',
-    description:
-      'Scan QR codes, monitor arrivals, and update the team without juggling separate tools.',
-    icon: Radar,
-  },
-];
-
-const showcase = [
-  {
-    image: '/dashboard-mockup.png',
-    title: 'Command center',
-    description:
-      'Keep registrations, check-ins, and attendance trends in one dense but readable view.',
-  },
-  {
-    image: '/event-ticket-mockup.png',
-    title: 'Ticket surfaces',
-    description:
-      'Present tickets with a clear identity and the exact details organizers need at entry.',
-  },
-  {
-    image: '/analytics-mockup.png',
-    title: 'Live performance',
-    description:
-      'Review event health, traffic, and conversions before and after the event closes.',
-  },
+const stats = [
+  { value: '120+', label: 'Colleges Using It' },
+  { value: '45k+', label: 'Events Hosted' },
+  { value: '1.2M', label: 'Students Reached' },
 ];
 
 const testimonials = [
   {
-    quote:
-      'We moved from spreadsheets and ad-hoc messages to a single flow the team could actually follow during live events.',
-    name: 'Aarav Mehta',
-    role: 'Cultural secretary, campus club',
+    quote: "ClubSync completely changed how we handle rush week. We went from messy spreadsheets to a seamless QR system.",
+    name: "Alex Rivera",
+    role: "President, Debate Society"
   },
   {
-    quote:
-      'The interface is direct. It gives enough control for organizers without making the dashboard feel crowded.',
-    name: 'Sara Iyer',
-    role: 'Events lead, student council',
+    quote: "The analytics are a game-changer. We finally know exactly who's showing up to our workshops and when.",
+    name: "Sarah Chen",
+    role: "Events VP, Tech Club"
   },
   {
-    quote:
-      'Check-in became a two-person job instead of a fire drill. That alone changed how our launch day felt.',
-    name: 'Rohit Nair',
-    role: 'Operations volunteer',
-  },
+    quote: "Collecting dues and selling tickets in one place means we actually have a budget this semester.",
+    name: "Jordan Smith",
+    role: "Treasurer, Arts Coalition"
+  }
 ];
 
-const faq = [
-  {
-    q: 'Is Eventflow built for small teams?',
-    a: 'Yes. It is designed for student teams and club organizers who need a clean workflow without a large operations staff.',
-  },
-  {
-    q: 'Can we run public and private events?',
-    a: 'Yes. The same flow supports open registration, invite-based access, and controlled entry depending on the event.',
-  },
-  {
-    q: 'Do we get attendee analytics?',
-    a: 'Yes. The dashboard is focused on the metrics that matter most: registrations, attendance, and conversion.',
-  },
-  {
-    q: 'Does it support on-site check-in?',
-    a: 'Yes. QR-based check-in is part of the core flow and is surfaced as a fast, operational tool.',
-  },
+const floatingBubbles = [
+  { icon: CheckCircle2, label: "RSVP Confirmed", top: "25%", left: "8%", delay: 0, rotate: -4 },
+  { icon: Users, label: "+42 this week", top: "15%", right: "12%", delay: 0.2, rotate: 3 },
+  { icon: Star, label: "New Event", bottom: "35%", right: "8%", delay: 0.4, rotate: -2 },
+  { icon: UsersRound, label: "+2 members", bottom: "45%", left: "12%", delay: 0.6, rotate: 4 },
 ];
 
-const chipLogos = ['IIT Delhi', 'BITS Pilani', 'NIT Trichy', 'VIT', 'SRM'];
 const ease = [0.16, 1, 0.3, 1] as const;
 
 export default function LandingPage() {
   return (
     <PublicLayout>
-      <div className="relative isolate overflow-hidden bg-canvas selection:bg-primary selection:text-ink">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(183,188,248,0.12),_transparent_36%),radial-gradient(circle_at_bottom_right,_rgba(73,128,115,0.1),_transparent_24%)]" />
-        <div className="pointer-events-none absolute inset-0 opacity-[0.06] [background-image:linear-gradient(rgba(244,244,240,0.2)_1px,transparent_1px),linear-gradient(90deg,rgba(244,244,240,0.2)_1px,transparent_1px)] [background-size:42px_42px]" />
-
-        <section className="relative pt-32 md:pt-36">
-          <div className="mx-auto max-w-6xl px-6 pb-16 lg:pb-20">
-            <div className="grid items-center gap-10 lg:grid-cols-[1.03fr_0.97fr]">
-              <motion.div
-                initial={{ opacity: 0, y: 18 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.65, ease }}
-                className="max-w-2xl"
-              >
-                <div className="inline-flex items-center gap-2 border-[2px] border-border bg-surface-1 px-3 py-2 text-[11px] font-black uppercase tracking-[0.24em] text-ink-muted shadow-brutal-sm">
-                  <Sparkles className="h-4 w-4 text-primary" />
-                  Campus event operations
-                </div>
-
-                <h1 className="mt-5 max-w-4xl text-[clamp(2.8rem,6.6vw,5.8rem)] font-black uppercase leading-[0.9] tracking-[-0.06em] text-ink">
-                  Plan, sell, scan, and report in one place.
-                </h1>
-
-                <p className="mt-5 max-w-xl text-base leading-7 text-ink-muted md:text-lg">
-                  Eventflow gives student teams a single workspace for tickets,
-                  check-ins, announcements, certificates, and event reporting.
-                </p>
-
-                <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-                  <Link href="/signup">
-                    <button className="inline-flex w-full items-center justify-center gap-2 border-[2px] border-border bg-primary px-5 py-4 text-sm font-black uppercase tracking-[0.18em] text-ink shadow-[6px_6px_0_0_var(--color-border)] transition-transform hover:-translate-x-1 hover:-translate-y-1 sm:w-auto">
-                      Start free
-                      <ArrowRight className="h-4 w-4" />
-                    </button>
-                  </Link>
-                  <Link href="/explore">
-                    <button className="inline-flex w-full items-center justify-center border-[2px] border-border bg-surface-1 px-5 py-4 text-sm font-black uppercase tracking-[0.18em] text-ink transition-colors hover:bg-surface-2 sm:w-auto">
-                      Explore events
-                    </button>
-                  </Link>
-                </div>
-
-                <div className="mt-8 grid gap-3 sm:grid-cols-3">
-                  {stats.map((item) => (
-                    <motion.div
-                      key={item.label}
-                      initial={{ opacity: 0, y: 14 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.5, delay: 0.08, ease }}
-                      className="border-[2px] border-border bg-surface-1 p-4 shadow-brutal-sm"
-                    >
-                      <div className="text-3xl font-black uppercase tracking-[-0.04em] text-ink">
-                        {item.value}
-                      </div>
-                      <div className="mt-1 text-xs font-semibold uppercase tracking-[0.18em] text-ink-muted">
-                        {item.label}
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 24, rotate: 1.2 }}
-                animate={{ opacity: 1, y: 0, rotate: 0 }}
-                transition={{ duration: 0.8, ease }}
-                className="relative"
-              >
-                <div className="border-[2px] border-border bg-surface-1 p-4 shadow-[10px_10px_0_0_var(--color-border)]">
-                  <div className="flex items-center justify-between border-b border-border pb-3">
-                    <div>
-                      <p className="text-[11px] font-black uppercase tracking-[0.22em] text-ink-muted">
-                        Live dashboard
-                      </p>
-                      <p className="mt-1 text-sm font-semibold text-ink">
-                        Eventflow / Campus launch
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] text-primary">
-                      <CheckCircle2 className="h-4 w-4" />
-                      Ready
-                    </div>
-                  </div>
-
-                  <div className="mt-4 overflow-hidden border-[2px] border-border bg-canvas">
-                    <div className="h-[310px] w-full">
-                      <HeroScene />
-                    </div>
-                  </div>
-
-                  <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                    <div className="border-[2px] border-border bg-canvas p-4">
-                      <p className="text-[11px] font-black uppercase tracking-[0.2em] text-ink-muted">
-                        Check-in status
-                      </p>
-                      <p className="mt-2 text-2xl font-black text-ink">Fast lane</p>
-                      <p className="mt-1 text-sm text-ink-muted">
-                        Live scan queue with clear access roles.
-                      </p>
-                    </div>
-                    <div className="border-[2px] border-border bg-canvas p-4">
-                      <p className="text-[11px] font-black uppercase tracking-[0.2em] text-ink-muted">
-                        Event readiness
-                      </p>
-                      <p className="mt-2 text-2xl font-black text-ink">94%</p>
-                      <p className="mt-1 text-sm text-ink-muted">
-                        Tickets, staff, and comms in place.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="absolute -bottom-5 left-5 border-[2px] border-border bg-primary px-4 py-3 shadow-[6px_6px_0_0_var(--color-border)]">
-                  <p className="text-[11px] font-black uppercase tracking-[0.22em] text-ink-muted">
-                    Queue time
-                  </p>
-                  <p className="text-2xl font-black text-ink">&lt; 1 min</p>
-                </div>
-              </motion.div>
+      <div className="relative isolate overflow-hidden bg-canvas selection:bg-accent-teal selection:text-white pb-24">
+        
+        {/* HERO SECTION */}
+        <section className="relative w-full">
+          <div className="relative bg-surface-2 overflow-hidden min-h-screen flex flex-col items-center pt-40 pb-48">
+            
+            {/* Background Image/Gradient */}
+            <div className="absolute inset-0 z-0">
+              <Image 
+                src="/Image.png" 
+                alt="Background" 
+                fill 
+                className="object-cover"
+                priority
+              />
             </div>
 
-            <div className="mt-14 border-y border-border py-5">
-              <div className="flex flex-wrap items-center justify-between gap-3 text-[11px] font-black uppercase tracking-[0.22em] text-ink-muted">
-                <span>Trusted by student teams and clubs</span>
-                <div className="flex flex-wrap gap-2">
-                  {chipLogos.map((logo) => (
-                    <span key={logo} className="border border-border bg-surface-1 px-3 py-2">
-                      {logo}
-                    </span>
-                  ))}
+            {/* Top Left Label */}
+            <div className="absolute top-28 left-4 md:left-8 z-10 flex items-center gap-2 text-ink-muted bg-white/40 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/60 shadow-sm">
+              <span className="text-xs font-semibold tracking-wide">✦ ClubSync.</span>
+            </div>
+
+            {/* Content Stack */}
+            <div className="relative z-10 flex flex-col items-center text-center max-w-4xl px-6 w-full mt-8 md:mt-16">
+              
+              <motion.div 
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, ease }}
+                className="glass-pill px-4 py-1.5 rounded-full flex items-center gap-2 shadow-soft-sm mb-6"
+              >
+                <span className="text-xs font-semibold uppercase tracking-wider text-primary">Campus Events, Simplified.</span>
+              </motion.div>
+
+              <motion.h1 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, delay: 0.1, ease }}
+                className="text-display-xl text-primary font-playfair"
+              >
+                Every Club. <span className="italic font-normal">One Sync.</span>
+              </motion.h1>
+
+              <motion.p 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, delay: 0.2, ease }}
+                className="mt-6 text-lg md:text-xl text-ink-muted max-w-2xl font-medium"
+              >
+                Discover events, manage clubs, and never miss what&apos;s happening on campus.
+              </motion.p>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, delay: 0.3, ease }}
+                className="mt-10 flex flex-col sm:flex-row items-center gap-4"
+              >
+                <Link href="/signup">
+                  <button className="bg-primary text-white px-8 py-3.5 rounded-full font-medium shadow-soft hover:bg-primary-hover transition-all hover:-translate-y-0.5">
+                    Start Your Club
+                  </button>
+                </Link>
+                <Link href="/explore">
+                  <button className="bg-white/80 backdrop-blur-md text-primary border border-white/60 px-8 py-3.5 rounded-full font-medium hover:bg-white transition-all shadow-sm">
+                    Explore Events
+                  </button>
+                </Link>
+              </motion.div>
+
+            </div>
+
+            {/* Floating Bubbles */}
+            {floatingBubbles.map((bubble, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.8, delay: 0.5 + bubble.delay, ease }}
+                className="absolute hidden md:flex items-center gap-2 glass-pill px-4 py-2 rounded-full shadow-soft-sm z-10"
+                style={{ 
+                  top: bubble.top, 
+                  left: bubble.left, 
+                  right: bubble.right, 
+                  bottom: bubble.bottom, 
+                  transform: `rotate(${bubble.rotate}deg)` 
+                }}
+              >
+                <div className="bg-white p-1 rounded-full shadow-sm text-primary">
+                  <bubble.icon className="w-3.5 h-3.5" />
+                </div>
+                <span className="text-[11px] font-semibold text-primary uppercase tracking-wide">{bubble.label}</span>
+              </motion.div>
+            ))}
+
+            {/* Overlapping Dashboard Mockup */}
+            <motion.div 
+              initial={{ opacity: 0, y: 60 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.9, delay: 0.4, ease }}
+              className="absolute -bottom-32 md:-bottom-48 left-0 right-0 mx-auto w-11/12 max-w-5xl z-20 perspective-[2000px]"
+            >
+              <div className="glass-panel rounded-[20px] p-2 md:p-3 shadow-glass border border-white/60 transform rotateX-2 transition-transform hover:rotateX-0 duration-700">
+                <div className="bg-white rounded-xl overflow-hidden border border-border/60 shadow-inner relative aspect-[16/9] md:aspect-[21/9]">
+                  
+                  {/* Browser/App Header */}
+                  <div className="absolute top-0 w-full h-12 bg-surface-2/50 flex items-center px-4 gap-4 border-b border-border/40">
+                    <div className="flex gap-1.5">
+                      <div className="w-3 h-3 rounded-full bg-red-400"></div>
+                      <div className="w-3 h-3 rounded-full bg-amber-400"></div>
+                      <div className="w-3 h-3 rounded-full bg-green-400"></div>
+                    </div>
+                    <div className="h-6 flex-1 max-w-sm bg-white rounded-md border border-border/50 hidden sm:block"></div>
+                  </div>
+                  
+                  {/* Mock content representation */}
+                  <div className="absolute top-12 bottom-0 w-full flex bg-canvas/30">
+                    {/* Sidebar */}
+                    <div className="w-48 lg:w-56 bg-surface-1/80 border-r border-border/50 p-4 hidden md:flex flex-col gap-6">
+                      <div className="h-5 w-24 bg-surface-3 rounded mb-2"></div>
+                      <div className="space-y-4">
+                        {[1,2,3,4,5].map(i => (
+                          <div key={i} className="flex gap-3 items-center">
+                            <div className="h-5 w-5 bg-surface-3 rounded-md"></div>
+                            <div className="h-3 w-full bg-surface-2 rounded"></div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    {/* Main Content Area */}
+                    <div className="flex-1 p-6 lg:p-8 flex flex-col gap-6 overflow-hidden">
+                      {/* Top bar */}
+                      <div className="flex justify-between items-center mb-2">
+                        <div className="h-8 w-48 bg-surface-3 rounded-md"></div>
+                        <div className="h-8 w-24 bg-primary/10 rounded-full"></div>
+                      </div>
+                      
+                      {/* Stats row */}
+                      <div className="grid grid-cols-3 gap-4">
+                         {[1,2,3].map(i => (
+                           <div key={i} className="h-24 bg-white border border-border/50 rounded-xl shadow-sm p-4 flex flex-col justify-between">
+                             <div className="h-3 w-16 bg-surface-3 rounded"></div>
+                             <div className="h-8 w-20 bg-surface-3 rounded"></div>
+                           </div>
+                         ))}
+                      </div>
+                      
+                      {/* List area */}
+                      <div className="flex-1 bg-white border border-border/50 rounded-xl shadow-sm p-4 flex flex-col gap-4">
+                        {[1,2,3].map(i => (
+                           <div key={i} className="h-12 w-full bg-surface-2/50 rounded-lg border border-border/30"></div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
+
           </div>
         </section>
 
-        <SectionShell
-          id="features"
-          eyebrow="Core modules"
-          title="Built for the full event lifecycle."
-          description="Everything is structured around the way campus teams actually work: prepare, publish, operate, and review."
-        >
-          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-            {features.map((feature, index) => (
-              <motion.article
-                key={feature.title}
-                initial={{ opacity: 0, y: 22 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.2 }}
-                transition={{ duration: 0.55, delay: index * 0.05, ease }}
-                className="border-[2px] border-border bg-surface-1 p-6 shadow-brutal-sm transition-transform hover:-translate-y-1"
-              >
-                <div className="flex h-11 w-11 items-center justify-center border-[2px] border-border bg-primary text-ink shadow-brutal-sm">
-                  <feature.icon className="h-5 w-5" />
+        {/* Spacing for overlapping mockup */}
+        <div className="h-48 md:h-64"></div>
+
+        {/* SOCIAL PROOF */}
+        <section className="py-12 bg-transparent relative z-10">
+          <div className="max-w-6xl mx-auto px-6">
+            <p className="text-center text-xs font-semibold uppercase tracking-widest text-ink-subtle mb-10">Trusted by campuses nationwide</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center divide-y md:divide-y-0 md:divide-x divide-border/60">
+              {stats.map((stat, i) => (
+                <div key={i} className="pt-6 md:pt-0">
+                  <p className="text-4xl md:text-5xl font-playfair font-bold text-primary">{stat.value}</p>
+                  <p className="mt-3 text-xs font-medium text-ink-muted uppercase tracking-wider">{stat.label}</p>
                 </div>
-                <h3 className="mt-5 text-xl font-black uppercase tracking-[-0.03em] text-ink">
-                  {feature.title}
-                </h3>
-                <p className="mt-3 text-sm leading-6 text-ink-muted">{feature.description}</p>
-              </motion.article>
-            ))}
-          </div>
-        </SectionShell>
-
-        <SectionShell
-          id="workflow"
-          eyebrow="Workflow"
-          title="A short path from setup to entry."
-          description="The layout stays linear so every step is visible without crowding the screen."
-        >
-          <div className="grid gap-5 lg:grid-cols-3">
-            {workflow.map((item, index) => (
-              <motion.article
-                key={item.step}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.2 }}
-                transition={{ duration: 0.55, delay: index * 0.08, ease }}
-                className="border-[2px] border-border bg-surface-1 p-6 shadow-brutal-sm"
-              >
-                <div className="flex items-center justify-between gap-4 border-b border-border pb-4">
-                  <div className="flex h-11 w-11 items-center justify-center border-[2px] border-border bg-canvas text-ink shadow-brutal-sm">
-                    <item.icon className="h-5 w-5 text-primary" />
-                  </div>
-                  <span className="text-xs font-black uppercase tracking-[0.24em] text-ink-muted">
-                    {item.step}
-                  </span>
-                </div>
-                <h3 className="mt-5 text-xl font-black uppercase tracking-[-0.03em] text-ink">
-                  {item.title}
-                </h3>
-                <p className="mt-3 text-sm leading-6 text-ink-muted">{item.description}</p>
-              </motion.article>
-            ))}
-          </div>
-        </SectionShell>
-
-        <section id="showcase" className="border-t border-border bg-surface-1">
-          <div className="mx-auto max-w-6xl px-6 py-20 lg:py-24">
-            <div className="max-w-3xl">
-              <p className="text-[11px] font-black uppercase tracking-[0.24em] text-primary">
-                Showcase
-              </p>
-              <h2 className="mt-4 text-[clamp(2.2rem,4.8vw,4.4rem)] font-black uppercase leading-[0.95] tracking-[-0.05em] text-ink">
-                Clean surfaces for tickets, dashboards, and reporting.
-              </h2>
-              <p className="mt-4 max-w-2xl text-sm leading-7 text-ink-muted md:text-base">
-                The product stays easy to scan: clear panels, direct labels, and enough structure to keep important data visible.
-              </p>
-            </div>
-
-            <div className="mt-10 grid gap-5 lg:grid-cols-3">
-              {showcase.map((item, index) => (
-                <motion.article
-                  key={item.title}
-                  initial={{ opacity: 0, y: 22 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, amount: 0.2 }}
-                  transition={{ duration: 0.55, delay: index * 0.08, ease }}
-                  className="border-[2px] border-border bg-canvas p-4 shadow-brutal-sm"
-                >
-                  <div className="relative h-56 overflow-hidden border-[2px] border-border bg-surface-1">
-                    <Image src={item.image} alt={item.title} fill className="object-cover" />
-                  </div>
-                  <h3 className="mt-4 text-lg font-black uppercase tracking-[-0.03em] text-ink">
-                    {item.title}
-                  </h3>
-                  <p className="mt-2 text-sm leading-6 text-ink-muted">{item.description}</p>
-                </motion.article>
               ))}
             </div>
           </div>
         </section>
 
-        <SectionShell
-          id="proof"
-          eyebrow="Proof"
-          title="Built for teams that need composure on event day."
-          description="The product should feel direct to use and still look deliberate enough to trust."
-        >
-          <div className="grid gap-5 lg:grid-cols-3">
-            {testimonials.map((item, index) => (
-              <motion.article
-                key={item.name}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.2 }}
-                transition={{ duration: 0.55, delay: index * 0.06, ease }}
-                className="border-[2px] border-border bg-surface-1 p-6 shadow-brutal-sm"
-              >
-                <MessageSquareQuote className="h-5 w-5 text-primary" />
-                <p className="mt-4 text-sm leading-7 text-ink">{item.quote}</p>
-                <div className="mt-6 border-t border-border pt-4">
-                  <p className="text-sm font-black uppercase tracking-[0.16em] text-ink">{item.name}</p>
-                  <p className="mt-1 text-xs uppercase tracking-[0.18em] text-ink-muted">{item.role}</p>
+        {/* FEATURES GRID */}
+        <SectionShell eyebrow="Everything you need" title="Run your club like a pro.">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mt-16">
+            {features.map((feature, i) => (
+              <div key={i} className="bg-white rounded-[24px] p-8 shadow-soft-sm border border-border/40 hover:shadow-soft transition-all duration-300 hover:-translate-y-1">
+                <div className="w-12 h-12 rounded-2xl bg-surface-2 flex items-center justify-center text-primary mb-6 shadow-inner">
+                  <feature.icon className="w-5 h-5" />
                 </div>
-              </motion.article>
+                <h3 className="text-lg font-semibold text-ink mb-3">{feature.title}</h3>
+                <p className="text-sm text-ink-muted leading-relaxed">{feature.description}</p>
+              </div>
             ))}
           </div>
         </SectionShell>
 
-        <section id="faq" className="border-t border-border bg-canvas">
-          <div className="mx-auto max-w-6xl px-6 py-20 lg:py-24">
-            <div className="grid gap-8 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
-              <div>
-                <p className="text-[11px] font-black uppercase tracking-[0.24em] text-primary">
-                  FAQ
-                </p>
-                <h2 className="mt-4 text-[clamp(2rem,4.4vw,4rem)] font-black uppercase leading-[0.95] tracking-[-0.05em] text-ink">
-                  The questions teams ask before switching.
-                </h2>
-                <p className="mt-4 max-w-xl text-sm leading-7 text-ink-muted md:text-base">
-                  The answers are intentionally short. The interface should reduce uncertainty, not add another layer of it.
-                </p>
-              </div>
-
-              <div className="grid gap-4">
-                {faq.map((item) => (
-                  <article key={item.q} className="border-[2px] border-border bg-surface-1 p-5 shadow-brutal-sm">
-                    <h3 className="text-base font-black uppercase tracking-[-0.02em] text-ink">{item.q}</h3>
-                    <p className="mt-3 text-sm leading-6 text-ink-muted">{item.a}</p>
-                  </article>
+        {/* SPOTLIGHT SECTION */}
+        <section className="py-24 max-w-6xl mx-auto px-6 overflow-hidden">
+          <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+            <div className="order-2 lg:order-1 relative h-[500px] rounded-[32px] bg-primary/5 p-8 border border-primary/10 overflow-hidden flex items-center justify-center shadow-inner">
+               <div className="absolute inset-0 bg-diagonal-stripes-subtle opacity-30"></div>
+               <div className="relative w-full max-w-sm aspect-[9/16] bg-white rounded-[32px] shadow-soft-lg border-[6px] border-surface-2 overflow-hidden flex flex-col">
+                 <div className="h-12 bg-primary/5 flex items-center justify-center border-b border-border/40">
+                   <div className="w-12 h-1.5 bg-border rounded-full"></div>
+                 </div>
+                 <div className="p-6 flex-1 flex flex-col gap-4">
+                   <div className="w-full aspect-video bg-surface-2 rounded-xl"></div>
+                   <div className="h-6 w-3/4 bg-surface-3 rounded-md mt-2"></div>
+                   <div className="h-4 w-1/2 bg-surface-2 rounded"></div>
+                   <div className="mt-auto">
+                     <div className="h-12 w-full bg-primary text-white rounded-xl flex items-center justify-center text-sm font-semibold">RSVP Now</div>
+                   </div>
+                 </div>
+               </div>
+            </div>
+            <div className="order-1 lg:order-2">
+              <div className="glass-pill inline-flex px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider text-primary mb-6">Discovery</div>
+              <h2 className="text-display-lg text-ink font-playfair mb-6">A single feed for your entire campus.</h2>
+              <p className="text-lg text-ink-muted mb-8 leading-relaxed">
+                Stop relying on scattered flyers and chaotic group chats. ClubSync brings every event into one beautiful, personalized feed that students actually want to browse.
+              </p>
+              <ul className="space-y-5">
+                {[
+                  'Personalized recommendations based on major and interests.',
+                  'One-tap RSVPs and instant calendar sync.',
+                  'Push notifications for venue changes or reminders.'
+                ].map((item, i) => (
+                  <li key={i} className="flex items-start gap-4">
+                    <CheckCircle2 className="w-5 h-5 text-accent-teal shrink-0 mt-0.5" />
+                    <span className="text-ink-muted font-medium text-sm leading-relaxed">{item}</span>
+                  </li>
                 ))}
-              </div>
+              </ul>
             </div>
           </div>
         </section>
 
-        <section className="border-t border-border bg-surface-1">
-          <div className="mx-auto max-w-6xl px-6 py-20 lg:py-24">
-            <div className="grid gap-8 border-[2px] border-border bg-canvas p-6 shadow-[10px_10px_0_0_var(--color-border)] lg:grid-cols-[1.1fr_0.9fr] lg:p-8">
-              <div>
-                <p className="text-[11px] font-black uppercase tracking-[0.24em] text-primary">
-                  Ready to build
-                </p>
-                <h2 className="mt-4 text-[clamp(2.2rem,5vw,4.4rem)] font-black uppercase leading-[0.92] tracking-[-0.06em] text-ink">
-                  Ship a cleaner event flow this week.
-                </h2>
-                <p className="mt-4 max-w-2xl text-sm leading-7 text-ink-muted md:text-base">
-                  Start with the landing page, move into the event workspace, and let the system do the repetitive work.
-                </p>
-              </div>
-
-              <div className="flex flex-col justify-between gap-4 border-[2px] border-border bg-surface-1 p-5">
-                <div className="flex items-center gap-3">
-                  <BadgeCheck className="h-5 w-5 text-primary" />
-                  <p className="text-sm font-semibold text-ink">
-                    Everything organizers need in one place.
-                  </p>
+        {/* TESTIMONIALS */}
+        <section className="py-24 bg-surface-2/50 mt-12 border-y border-border/40">
+          <div className="max-w-6xl mx-auto px-6">
+            <h2 className="text-center text-display-md font-playfair text-ink mb-16">Loved by student leaders.</h2>
+            <div className="grid md:grid-cols-3 gap-6">
+              {testimonials.map((test, i) => (
+                <div key={i} className="bg-white p-8 rounded-[24px] shadow-soft-sm border border-border/30 flex flex-col justify-between hover:shadow-soft transition-shadow">
+                  <div>
+                    <div className="flex gap-1 mb-6 text-accent-gold">
+                      {[1,2,3,4,5].map(star => <Star key={star} className="w-4 h-4 fill-current" />)}
+                    </div>
+                    <p className="text-ink text-base leading-relaxed font-medium mb-8">&quot;{test.quote}&quot;</p>
+                  </div>
+                  <div>
+                    <p className="font-semibold text-primary">{test.name}</p>
+                    <p className="text-xs font-medium text-ink-muted mt-1">{test.role}</p>
+                  </div>
                 </div>
-                <div className="flex flex-col gap-3 sm:flex-row">
-                  <Link href="/signup" className="flex-1">
-                    <button className="w-full border-[2px] border-border bg-primary px-5 py-4 text-sm font-black uppercase tracking-[0.18em] text-ink shadow-[6px_6px_0_0_var(--color-border)] transition-transform hover:-translate-x-1 hover:-translate-y-1">
-                      Create account
-                    </button>
-                  </Link>
-                  <Link href="/login" className="flex-1">
-                    <button className="w-full border-[2px] border-border bg-canvas px-5 py-4 text-sm font-black uppercase tracking-[0.18em] text-ink transition-colors hover:bg-surface-2">
-                      Log in
-                    </button>
-                  </Link>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
         </section>
+
+        {/* CTA SECTION */}
+        <section className="py-24 px-4 sm:px-6 max-w-5xl mx-auto">
+          <div className="rounded-[32px] overflow-hidden relative shadow-soft-lg p-12 md:p-24 text-center flex flex-col items-center border border-white/60">
+             <div className="absolute inset-0 bg-gradient-to-br from-teal-50 via-teal-100/40 to-yellow-50/40 z-0"></div>
+             
+             <div className="relative z-10 w-full max-w-2xl">
+               <h2 className="text-display-lg text-primary font-playfair mb-6">Ready to upgrade your campus experience?</h2>
+               <p className="text-lg text-ink-muted mb-10">
+                 Join thousands of students and clubs already using ClubSync to make campus life better, simpler, and more connected.
+               </p>
+               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                  <Link href="/signup">
+                    <button className="bg-primary text-white px-8 py-4 rounded-full font-medium shadow-soft hover:bg-primary-hover transition-all hover:-translate-y-0.5 w-full sm:w-auto">
+                      Get Started for Free
+                    </button>
+                  </Link>
+                  <Link href="/demo">
+                    <button className="bg-white/80 backdrop-blur text-primary border border-white/80 px-8 py-4 rounded-full font-medium shadow-sm hover:bg-white transition-all w-full sm:w-auto">
+                      Book a Demo
+                    </button>
+                  </Link>
+               </div>
+             </div>
+          </div>
+        </section>
+
       </div>
     </PublicLayout>
   );
 }
 
 function SectionShell({
-  id,
   eyebrow,
   title,
-  description,
   children,
 }: {
-  id: string;
   eyebrow: string;
   title: string;
-  description: string;
   children: ReactNode;
 }) {
   return (
-    <section id={id} className="border-t border-border">
-      <div className="mx-auto max-w-6xl px-6 py-20 lg:py-24">
-        <div className="max-w-3xl">
-          <p className="text-[11px] font-black uppercase tracking-[0.24em] text-primary">
+    <section className="py-20 md:py-28">
+      <div className="mx-auto max-w-6xl px-6">
+        <div className="text-center max-w-2xl mx-auto">
+          <p className="text-xs font-semibold uppercase tracking-widest text-primary mb-4">
             {eyebrow}
           </p>
-          <h2 className="mt-4 text-[clamp(2.2rem,4.8vw,4.4rem)] font-black uppercase leading-[0.95] tracking-[-0.05em] text-ink">
+          <h2 className="text-display-md font-playfair text-ink">
             {title}
           </h2>
-          <p className="mt-4 max-w-2xl text-sm leading-7 text-ink-muted md:text-base">
-            {description}
-          </p>
         </div>
-        <div className="mt-10">{children}</div>
+        <div>{children}</div>
       </div>
     </section>
   );
