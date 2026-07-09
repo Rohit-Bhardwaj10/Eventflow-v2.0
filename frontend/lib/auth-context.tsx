@@ -32,6 +32,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const refreshUser = useCallback(async () => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('ef_access') : null;
+
+    // DEV OVERRIDE: Skip login in development by attempting to hit backend mock user
+    // if (process.env.NODE_ENV !== 'production' && (!token || token === 'undefined')) {
+    //   try {
+    //     const me = await auth.me();
+    //     setUser(me);
+    //   } catch {
+    //     setUser({ id: 'dev-user', name: 'Dev User', email: 'dev@example.com', role: 'STUDENT' });
+    //   }
+    //   setLoading(false);
+    //   return;
+    // }
+
     if (!token || token === 'undefined') {
       setUser(null);
       setLoading(false);
@@ -70,7 +83,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = useCallback(async () => {
     try {
       await auth.logout();
-    } catch {}
+    } catch { }
     clearTokens();
     setUser(null);
   }, []);
