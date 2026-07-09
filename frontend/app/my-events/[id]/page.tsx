@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layouts/app-layout';
-import { Button } from '@/components/ui/button';
 import { registrations, type Registration, ApiError } from '@/lib/api';
 import {
   ArrowLeft,
@@ -15,11 +14,11 @@ import {
   Loader2,
   QrCode,
   Globe,
-  CheckCircle2,
 } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 function formatDate(d: string) {
-  return new Date(d).toLocaleDateString('en-IN', {
+  return new Date(d).toLocaleDateString('en-US', {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
@@ -27,14 +26,14 @@ function formatDate(d: string) {
   });
 }
 function formatTime(d: string) {
-  return new Date(d).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+  return new Date(d).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 }
 
 const statusConfig: Record<string, { label: string; cls: string }> = {
-  CONFIRMED: { label: 'Confirmed', cls: 'text-primary border-primary/40 bg-primary/10' },
-  WAITLISTED: { label: 'Waitlisted', cls: 'text-yellow-400 border-yellow-400/40 bg-yellow-400/10' },
-  CANCELLED: { label: 'Cancelled', cls: 'text-red-400 border-red-400/40 bg-red-400/10' },
-  ATTENDED: { label: 'Attended ✓', cls: 'text-green-400 border-green-400/40 bg-green-400/10' },
+  CONFIRMED: { label: 'Confirmed', cls: 'text-accent-teal border-accent-teal/30 bg-accent-teal/5' },
+  WAITLISTED: { label: 'Waitlisted', cls: 'text-accent-gold border-accent-gold/30 bg-accent-gold/5' },
+  CANCELLED: { label: 'Cancelled', cls: 'text-red-400 border-red-500/30 bg-red-500/5' },
+  ATTENDED: { label: 'Attended ✓', cls: 'text-accent-pink border-accent-pink/30 bg-accent-pink/5' },
 };
 
 export default function MyTicketPage() {
@@ -56,7 +55,7 @@ export default function MyTicketPage() {
     return (
       <AppLayout>
         <div className="flex-1 flex items-center justify-center py-24">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <Loader2 className="h-8 w-8 animate-spin text-accent-pink/60" />
         </div>
       </AppLayout>
     );
@@ -65,9 +64,13 @@ export default function MyTicketPage() {
   if (notFound || !reg) {
     return (
       <AppLayout>
-        <div className="flex-1 flex flex-col items-center justify-center py-24 gap-4">
-          <p className="text-xl font-black uppercase text-ink">Ticket not found.</p>
-          <Link href="/my-events"><Button variant="secondary">Back to My Events</Button></Link>
+        <div className="flex-1 flex flex-col items-center justify-center py-24 gap-6">
+          <p className="text-2xl font-playfair font-bold text-ink">Ticket not found.</p>
+          <Link href="/my-events">
+             <button className="bg-surface-2 border border-border/80 text-ink px-6 py-3 rounded-full font-semibold text-[14px] hover:border-accent-pink/50 hover:bg-surface-1 transition-all shadow-sm">
+              Back to My Events
+             </button>
+          </Link>
         </div>
       </AppLayout>
     );
@@ -77,109 +80,153 @@ export default function MyTicketPage() {
 
   return (
     <AppLayout>
-      <div className="max-w-2xl mx-auto flex flex-col gap-8">
-        <Link href="/my-events" className="inline-flex items-center gap-2 text-sm text-ink-muted hover:text-ink transition-colors">
-          <ArrowLeft className="h-4 w-4" />
+      <div className="max-w-2xl mx-auto flex flex-col gap-6 pt-4">
+        <Link href="/my-events" className="inline-flex items-center gap-2 text-[14px] font-semibold text-ink-muted hover:text-ink transition-colors w-fit group">
+          <div className="p-2 rounded-full bg-surface-1 border border-border/60 group-hover:border-ink/20 group-hover:bg-surface-2 transition-all">
+            <ArrowLeft className="h-4 w-4" />
+          </div>
           Back to My Events
         </Link>
 
         {/* Ticket Card */}
-        <div className="border-[2px] border-border bg-surface-1 shadow-[8px_8px_0_0_var(--color-border)] overflow-hidden">
-          {/* Top stripe */}
-          <div className="bg-primary h-2" />
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="bg-surface-2/60 backdrop-blur-md border border-border/60 rounded-[32px] shadow-soft overflow-hidden relative"
+        >
+           {/* Decorative background glow */}
+           <div className="absolute top-0 right-0 w-64 h-64 bg-accent-pink/5 rounded-full blur-[60px] pointer-events-none" />
 
-          <div className="p-6 sm:p-8">
+          {/* Top stripe */}
+          <div className="bg-gradient-to-r from-accent-pink to-accent-purple h-2" />
+
+          <div className="p-8 sm:p-10 relative z-10">
             {/* Header */}
-            <div className="flex items-start justify-between gap-4 mb-6">
+            <div className="flex flex-col sm:flex-row items-start justify-between gap-6 mb-8">
               <div>
-                <p className="text-[11px] font-black uppercase tracking-[0.22em] text-primary mb-1">
+                <p className="text-[11px] font-bold uppercase tracking-widest text-accent-pink mb-2">
                   {reg.event.club.name}
                 </p>
-                <h1 className="text-xl font-black uppercase leading-[1.1] tracking-[-0.03em] text-ink">
+                <h1 className="text-[28px] font-playfair font-bold leading-[1.1] tracking-tight text-ink">
                   {reg.event.title}
                 </h1>
               </div>
-              <span className={`text-[10px] font-black uppercase tracking-[0.14em] border px-3 py-1.5 shrink-0 ${status.cls}`}>
+              <span className={`text-[11px] font-bold uppercase tracking-wider border rounded-full px-4 py-2 shrink-0 ${status.cls}`}>
                 {status.label}
               </span>
             </div>
 
             {/* Details grid */}
-            <div className="grid sm:grid-cols-2 gap-4 mb-6 border-t border-b border-border/50 py-5">
-              <div>
-                <p className="text-[9px] font-black uppercase tracking-[0.2em] text-ink-muted mb-1">Date</p>
-                <p className="text-sm font-semibold text-ink flex items-center gap-2">
-                  <CalendarDays className="h-4 w-4 text-primary" />
-                  {formatDate(reg.event.startAt)}
-                </p>
+            <div className="grid sm:grid-cols-2 gap-6 mb-8 border-t border-b border-border/40 py-8">
+              <div className="flex gap-4">
+                <div className="h-10 w-10 rounded-full bg-surface-1 border border-border/60 flex items-center justify-center shrink-0 shadow-sm">
+                   <CalendarDays className="h-4 w-4 text-accent-pink" />
+                </div>
+                <div>
+                  <p className="text-[11px] font-bold uppercase tracking-widest text-ink-muted mb-1">Date</p>
+                  <p className="text-[14px] font-medium text-ink">
+                    {formatDate(reg.event.startAt)}
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="text-[9px] font-black uppercase tracking-[0.2em] text-ink-muted mb-1">Time</p>
-                <p className="text-sm font-semibold text-ink flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-primary" />
-                  {formatTime(reg.event.startAt)} – {formatTime(reg.event.endAt)}
-                </p>
+
+              <div className="flex gap-4">
+                 <div className="h-10 w-10 rounded-full bg-surface-1 border border-border/60 flex items-center justify-center shrink-0 shadow-sm">
+                   <Clock className="h-4 w-4 text-accent-pink" />
+                </div>
+                <div>
+                  <p className="text-[11px] font-bold uppercase tracking-widest text-ink-muted mb-1">Time</p>
+                  <p className="text-[14px] font-medium text-ink">
+                    {formatTime(reg.event.startAt)} – {formatTime(reg.event.endAt)}
+                  </p>
+                </div>
               </div>
+
               {reg.event.venue && (
-                <div>
-                  <p className="text-[9px] font-black uppercase tracking-[0.2em] text-ink-muted mb-1">Venue</p>
-                  <p className="text-sm font-semibold text-ink flex items-center gap-2">
-                    <MapPin className="h-4 w-4 text-primary" />
-                    {reg.event.venue}
-                  </p>
+                <div className="flex gap-4">
+                   <div className="h-10 w-10 rounded-full bg-surface-1 border border-border/60 flex items-center justify-center shrink-0 shadow-sm">
+                     <MapPin className="h-4 w-4 text-accent-pink" />
+                  </div>
+                  <div>
+                    <p className="text-[11px] font-bold uppercase tracking-widest text-ink-muted mb-1">Venue</p>
+                    <p className="text-[14px] font-medium text-ink">
+                      {reg.event.venue}
+                    </p>
+                  </div>
                 </div>
               )}
+
               {reg.event.meetingLink && (
-                <div>
-                  <p className="text-[9px] font-black uppercase tracking-[0.2em] text-ink-muted mb-1">Join Online</p>
-                  <a
-                    href={reg.event.meetingLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm font-semibold text-primary flex items-center gap-2 hover:underline"
-                  >
-                    <Globe className="h-4 w-4" />
-                    Open Link
-                  </a>
+                 <div className="flex gap-4">
+                   <div className="h-10 w-10 rounded-full bg-surface-1 border border-border/60 flex items-center justify-center shrink-0 shadow-sm">
+                     <Globe className="h-4 w-4 text-accent-pink" />
+                  </div>
+                  <div>
+                    <p className="text-[11px] font-bold uppercase tracking-widest text-ink-muted mb-1">Join Online</p>
+                    <a
+                      href={reg.event.meetingLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[14px] font-medium text-accent-pink hover:underline"
+                    >
+                      Open Link
+                    </a>
+                  </div>
                 </div>
               )}
+
               {reg.tier && (
+                <div className="flex gap-4">
+                   <div className="h-10 w-10 rounded-full bg-surface-1 border border-border/60 flex items-center justify-center shrink-0 shadow-sm">
+                     <Ticket className="h-4 w-4 text-accent-pink" />
+                  </div>
+                  <div>
+                    <p className="text-[11px] font-bold uppercase tracking-widest text-ink-muted mb-1">Ticket Type</p>
+                    <p className="text-[14px] font-medium text-ink">
+                      {reg.tier.name}
+                      {reg.tier.price > 0 && ` · ₹${reg.tier.price}`}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex gap-4">
+                 <div className="h-10 w-10 rounded-full bg-surface-1 border border-border/60 flex items-center justify-center shrink-0 shadow-sm">
+                    <div className="h-2 w-2 rounded-full bg-accent-pink" />
+                  </div>
                 <div>
-                  <p className="text-[9px] font-black uppercase tracking-[0.2em] text-ink-muted mb-1">Ticket Type</p>
-                  <p className="text-sm font-semibold text-ink flex items-center gap-2">
-                    <Ticket className="h-4 w-4 text-primary" />
-                    {reg.tier.name}
-                    {reg.tier.price > 0 && ` · ₹${reg.tier.price}`}
+                  <p className="text-[11px] font-bold uppercase tracking-widest text-ink-muted mb-1">Registered At</p>
+                  <p className="text-[14px] font-medium text-ink">
+                    {formatDate(reg.registeredAt)}
                   </p>
                 </div>
-              )}
-              <div>
-                <p className="text-[9px] font-black uppercase tracking-[0.2em] text-ink-muted mb-1">Registered At</p>
-                <p className="text-sm font-semibold text-ink">
-                  {formatDate(reg.registeredAt)}
-                </p>
               </div>
             </div>
 
-            {/* QR Code */}
-            <div className="flex flex-col items-center py-6 border-[2px] border-dashed border-border bg-canvas">
+            {/* QR Code section - uses a dashed cutout style */}
+            <div className="flex flex-col items-center py-8 bg-canvas/30 rounded-2xl border border-dashed border-border/80">
               {reg.qrCodeDataUrl ? (
                 <>
-                  <img src={reg.qrCodeDataUrl} alt="QR Code" className="h-48 w-48 mb-4" />
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-ink-muted text-center">
+                  <div className="bg-white p-3 rounded-2xl shadow-sm mb-4">
+                     <img src={reg.qrCodeDataUrl} alt="QR Code" className="h-48 w-48 rounded-lg" />
+                  </div>
+                  <p className="text-[12px] font-semibold text-ink-muted text-center max-w-[200px]">
                     Show this at the venue for check-in
                   </p>
                 </>
               ) : (
                 <>
-                  <QrCode className="h-20 w-20 text-ink-muted mb-3" />
-                  <p className="text-[11px] font-black uppercase tracking-[0.2em] text-ink-muted text-center">
+                  <div className="h-24 w-24 rounded-2xl bg-surface-1 border border-border/60 flex items-center justify-center mb-4">
+                     <QrCode className="h-10 w-10 text-ink-muted/50" />
+                  </div>
+                  <p className="text-[11px] font-bold uppercase tracking-widest text-ink-muted text-center mb-2">
                     QR Code
                   </p>
-                  <p className="text-[10px] text-ink-muted mt-1 font-mono">
+                  <p className="text-[13px] font-mono font-medium text-ink bg-surface-1 px-3 py-1.5 rounded-lg border border-border/40">
                     {reg.qrToken}
                   </p>
-                  <p className="text-[10px] text-ink-muted mt-2 text-center">
+                  <p className="text-[12px] font-medium text-ink-muted mt-3 text-center">
                     Show your Ticket ID at the venue
                   </p>
                 </>
@@ -187,25 +234,25 @@ export default function MyTicketPage() {
             </div>
 
             {/* Registration ID */}
-            <div className="mt-5 text-center">
-              <p className="text-[9px] font-black uppercase tracking-[0.2em] text-ink-muted mb-1">
+            <div className="mt-8 text-center flex flex-col items-center">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-ink-muted/70 mb-1">
                 Registration ID
               </p>
-              <p className="text-xs font-mono text-ink-muted">{reg.id}</p>
+              <p className="text-[11px] font-mono text-ink-muted/50">{reg.id}</p>
             </div>
           </div>
-        </div>
+        </motion.div>
 
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-4 pt-2 pb-10">
           <Link href={`/events/${reg.event.slug}`} className="flex-1">
-            <Button variant="secondary" className="w-full">
+            <button className="w-full bg-ink text-canvas hover:bg-ink/90 px-6 py-4 rounded-xl font-bold text-[14px] transition-all shadow-md">
               Event Details
-            </Button>
+            </button>
           </Link>
           <Link href="/my-events" className="flex-1">
-            <Button variant="tertiary" className="w-full">
+            <button className="w-full px-6 py-4 rounded-xl font-bold text-[14px] bg-surface-2 border border-border/80 text-ink hover:bg-surface-1 transition-all shadow-sm">
               All My Events
-            </Button>
+            </button>
           </Link>
         </div>
       </div>

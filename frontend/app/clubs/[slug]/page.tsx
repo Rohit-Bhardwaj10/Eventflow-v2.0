@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { PublicLayout } from '@/components/layouts/public-layout';
-import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/auth-context';
 import { clubs, events, type Club, type Event, ApiError } from '@/lib/api';
 import {
@@ -15,10 +14,13 @@ import {
   CalendarDays,
   CheckCircle2,
   MapPin,
+  Instagram,
+  Twitter
 } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 function formatDate(d: string) {
-  return new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+  return new Date(d).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
 export default function ClubDetailPage() {
@@ -84,9 +86,12 @@ export default function ClubDetailPage() {
 
   if (loading) {
     return (
-      <PublicLayout>
-        <div className="flex-1 flex items-center justify-center py-24">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <PublicLayout hideNav={true}>
+        <div className="flex-1 flex flex-col items-center justify-center min-h-screen bg-canvas">
+          <div className="relative w-12 h-12">
+            <div className="absolute inset-0 rounded-full border-2 border-border"></div>
+            <div className="absolute inset-0 rounded-full border-2 border-accent-teal border-t-transparent animate-spin"></div>
+          </div>
         </div>
       </PublicLayout>
     );
@@ -94,181 +99,243 @@ export default function ClubDetailPage() {
 
   if (notFound || !club) {
     return (
-      <PublicLayout>
-        <div className="flex-1 flex flex-col items-center justify-center py-24 gap-4">
-          <p className="text-xl font-black uppercase text-ink">Club not found.</p>
-          <Link href="/clubs"><Button variant="secondary">Browse Clubs</Button></Link>
+      <PublicLayout hideNav={true}>
+        <div className="flex-1 flex flex-col items-center justify-center min-h-screen bg-canvas gap-6">
+          <p className="text-2xl font-playfair font-medium text-ink">Club not found.</p>
+          <Link href="/explore">
+            <button className="bg-surface-2 border border-border/80 text-ink px-6 py-2.5 rounded-full font-medium text-[14px] hover:border-accent-teal/50 hover:bg-surface-1 transition-all shadow-sm">
+              Back to Explore
+            </button>
+          </Link>
         </div>
       </PublicLayout>
     );
   }
 
   return (
-    <PublicLayout>
-      <div className="max-w-5xl mx-auto px-6 py-12 w-full">
-        <Link href="/clubs" className="inline-flex items-center gap-2 text-sm text-ink-muted hover:text-ink mb-8 transition-colors">
-          <ArrowLeft className="h-4 w-4" />
-          Back to Clubs
-        </Link>
+    <PublicLayout hideNav={true}>
+      <div className="relative isolate overflow-hidden min-h-screen">
+        {/* Subtle grid texture */}
+        <div className="pointer-events-none fixed inset-0 z-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:28px_28px] [mask-image:radial-gradient(ellipse_80%_80%_at_50%_30%,#000_40%,transparent_100%)]" />
+        
+        {/* Soft Gold/Blue Glow */}
+        <div className="fixed top-[5%] right-[10%] w-[500px] h-[500px] bg-accent-gold/5 rounded-full blur-[120px] pointer-events-none"></div>
 
-        {/* Club banner */}
-        <div className="border-[2px] border-border overflow-hidden h-52 bg-surface-2 relative mb-8">
-          {club.banner ? (
-            <img src={club.banner} alt="" className="w-full h-full object-cover" />
-          ) : (
-            <div className="w-full h-full bg-gradient-to-br from-surface-1 to-surface-2 flex items-center justify-center">
-              <span className="text-[120px] font-black text-ink/5 select-none">{club.name[0]}</span>
-            </div>
-          )}
-        </div>
+        <div className="relative z-10 max-w-6xl mx-auto px-6 py-24 w-full">
+          <Link href="/explore" className="inline-flex items-center gap-2 text-[13px] font-semibold text-ink-muted hover:text-ink mb-10 transition-colors bg-surface-2/50 border border-border/60 px-4 py-2 rounded-full backdrop-blur-md hover:border-accent-teal/30 shadow-sm">
+            <ArrowLeft className="h-4 w-4" />
+            Back to Explore
+          </Link>
 
-        <div className="grid lg:grid-cols-[1fr_320px] gap-8 items-start">
-          {/* Left */}
-          <div className="flex flex-col gap-8">
-            {/* Header */}
-            <div className="flex items-start gap-5">
-              {club.logo && (
-                <div className="h-16 w-16 border-[2px] border-border bg-canvas overflow-hidden shrink-0">
-                  <img src={club.logo} alt={club.name} className="w-full h-full object-cover" />
-                </div>
-              )}
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <h1 className="text-2xl font-black uppercase tracking-[-0.04em] text-ink">
-                    {club.name}
-                  </h1>
-                  {club.isVerified && <CheckCircle2 className="h-5 w-5 text-primary" />}
-                </div>
-                {club.tagline && (
-                  <p className="text-sm text-ink-muted">{club.tagline}</p>
+          {/* Club banner */}
+          <div className="rounded-[24px] border border-border/60 overflow-hidden h-64 bg-surface-2 relative mb-12 shadow-soft">
+            {club.banner ? (
+              <img src={club.banner} alt="" className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full bg-gradient-to-br from-primary/80 to-[#0A1A17] flex items-center justify-center opacity-80">
+                <span className="text-[120px] font-black text-canvas/5 select-none">{club.name[0]}</span>
+              </div>
+            )}
+            <div className="absolute inset-0 bg-gradient-to-t from-canvas/80 via-transparent to-transparent"></div>
+          </div>
+
+          <div className="grid lg:grid-cols-[1fr_320px] gap-12 items-start">
+            {/* Left */}
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="flex flex-col gap-10"
+            >
+              {/* Header */}
+              <div className="flex flex-col sm:flex-row sm:items-start gap-6 -mt-24 relative z-10">
+                {club.logo ? (
+                  <div className="h-32 w-32 rounded-[24px] border-4 border-canvas bg-surface-1 overflow-hidden shrink-0 shadow-soft-lg">
+                    <img src={club.logo} alt={club.name} className="w-full h-full object-cover" />
+                  </div>
+                ) : (
+                  <div className="h-32 w-32 rounded-[24px] border-4 border-canvas bg-surface-2 flex items-center justify-center shrink-0 shadow-soft-lg">
+                    <span className="text-4xl font-playfair font-bold text-ink">{club.name[0]}</span>
+                  </div>
                 )}
-                <div className="flex items-center gap-4 mt-2">
-                  <span className="text-[10px] font-black uppercase tracking-[0.18em] border border-border px-2 py-1 text-primary">
-                    {club.category}
-                  </span>
-                  <span className="text-[10px] text-ink-muted flex items-center gap-1">
-                    <Users className="h-3 w-3" />
-                    {club._count?.members ?? 0} members
-                  </span>
+                <div className="sm:mt-16 sm:ml-2">
+                  <div className="flex items-center gap-3 mb-2">
+                    <h1 className="text-[32px] font-playfair font-bold tracking-tight text-ink">
+                      {club.name}
+                    </h1>
+                    {club.isVerified && <CheckCircle2 className="h-6 w-6 text-accent-teal" />}
+                  </div>
+                  {club.tagline && (
+                    <p className="text-[16px] text-ink-muted/90 font-medium mb-4">{club.tagline}</p>
+                  )}
+                  <div className="flex items-center gap-4">
+                    <span className="glass-pill px-3 py-1 font-sans text-[11px] font-bold uppercase tracking-[0.15em] text-accent-teal shadow-sm">
+                      {club.category}
+                    </span>
+                    <span className="text-[14px] text-ink-muted flex items-center gap-1.5 font-medium">
+                      <Users className="h-4 w-4" />
+                      {club._count?.members ?? 0} members
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Bio */}
-            {club.bio && (
+              {/* Bio */}
+              {club.bio && (
+                <section className="bg-surface-2/40 backdrop-blur-sm border border-border/60 rounded-3xl p-8 shadow-soft">
+                  <h2 className="text-[20px] font-playfair font-medium text-ink mb-4">
+                    About {club.name}
+                  </h2>
+                  <p className="text-[15px] leading-relaxed text-ink-muted whitespace-pre-line">{club.bio}</p>
+                </section>
+              )}
+
+              {/* Events */}
               <section>
-                <h2 className="text-sm font-black uppercase tracking-[-0.02em] text-ink mb-3 border-b border-border pb-2">
-                  About
-                </h2>
-                <p className="text-sm leading-7 text-ink-muted whitespace-pre-line">{club.bio}</p>
-              </section>
-            )}
-
-            {/* Events */}
-            <section>
-              <h2 className="text-sm font-black uppercase tracking-[-0.02em] text-ink mb-4 border-b border-border pb-2">
-                Events by {club.name}
-              </h2>
-              {clubEvents.length === 0 ? (
-                <p className="text-sm text-ink-muted py-4">No published events from this club yet.</p>
-              ) : (
-                <div className="flex flex-col gap-3">
-                  {clubEvents.map((ev) => (
-                    <Link key={ev.id} href={`/events/${ev.slug}`}>
-                      <div className="border-[2px] border-border bg-surface-1 p-4 hover:bg-surface-2 transition-colors flex items-center gap-4 shadow-brutal-sm">
-                        <div className="flex flex-col items-center w-12 shrink-0 border-r border-border pr-3">
-                          <span className="text-[8px] font-black uppercase text-primary">
-                            {new Date(ev.startAt).toLocaleString('en', { month: 'short' })}
-                          </span>
-                          <span className="text-xl font-black text-ink">
-                            {new Date(ev.startAt).getDate()}
-                          </span>
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h3 className="text-sm font-black uppercase text-ink truncate">{ev.title}</h3>
-                          <div className="flex items-center gap-3 mt-1">
-                            {ev.venue && (
-                              <span className="text-[10px] text-ink-muted flex items-center gap-1">
-                                <MapPin className="h-3 w-3" />
-                                {ev.venue}
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-[20px] font-playfair font-medium text-ink">
+                    Upcoming Events
+                  </h2>
+                </div>
+                {clubEvents.length === 0 ? (
+                  <div className="border border-border/60 bg-surface-2/30 backdrop-blur-sm rounded-3xl p-12 text-center shadow-soft">
+                    <CalendarDays className="h-10 w-10 text-ink-muted mx-auto mb-4 opacity-50" />
+                    <p className="text-[15px] text-ink-muted font-medium">No published events from this club yet.</p>
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-4">
+                    {clubEvents.map((ev) => (
+                      <Link key={ev.id} href={`/events/${ev.slug}`}>
+                        <div className="bg-surface-2/60 backdrop-blur-md border border-border/60 rounded-2xl p-5 hover:border-accent-teal/40 transition-all shadow-sm hover:shadow-soft group flex items-center gap-6">
+                          
+                          {/* Date Block */}
+                          <div className="flex flex-col items-center justify-center w-16 h-16 rounded-xl bg-canvas border border-border/80 shrink-0 group-hover:border-accent-teal/30 transition-colors">
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-accent-teal">
+                              {new Date(ev.startAt).toLocaleString('en-US', { month: 'short' })}
+                            </span>
+                            <span className="text-[22px] font-playfair font-bold text-ink leading-none mt-1">
+                              {new Date(ev.startAt).getDate()}
+                            </span>
+                          </div>
+                          
+                          {/* Details */}
+                          <div className="flex-1 min-w-0">
+                            <h3 className="text-[16px] font-bold text-ink truncate group-hover:text-primary transition-colors">{ev.title}</h3>
+                            <div className="flex items-center gap-4 mt-2">
+                              {ev.venue && (
+                                <span className="text-[13px] text-ink-muted flex items-center gap-1.5">
+                                  <MapPin className="h-3.5 w-3.5" />
+                                  <span className="truncate max-w-[150px]">{ev.venue}</span>
+                                </span>
+                              )}
+                              <span className="text-[13px] text-ink-muted flex items-center gap-1.5">
+                                <Users className="h-3.5 w-3.5" />
+                                {ev._count?.registrations ?? 0} registered
                               </span>
-                            )}
-                            <span className="text-[10px] text-ink-muted">
-                              {ev._count?.registrations ?? 0} registered
+                            </div>
+                          </div>
+                          
+                          {/* Status Badge */}
+                          <div className="hidden sm:block">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-ink-muted bg-surface-1 border border-border/80 px-3 py-1.5 rounded-full">
+                              {ev.status}
                             </span>
                           </div>
                         </div>
-                        <span className="text-[10px] font-black uppercase text-ink border border-border px-2 py-1 shrink-0">
-                          {ev.status}
-                        </span>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </section>
-          </div>
-
-          {/* Right sidebar */}
-          <div className="flex flex-col gap-4 lg:sticky lg:top-24">
-            {/* Join/leave */}
-            <div className="border-[2px] border-border bg-surface-1 p-5 shadow-[6px_6px_0_0_var(--color-border)]">
-              <p className="text-[11px] font-black uppercase tracking-[0.22em] text-primary mb-4">Membership</p>
-
-              {joinError && (
-                <div className="mb-3 border border-red-500/40 bg-red-500/10 px-3 py-2 text-xs text-red-400 font-semibold">
-                  {joinError}
-                </div>
-              )}
-
-              {joined ? (
-                <div className="flex flex-col gap-3">
-                  <div className="flex items-center gap-2 text-sm text-green-400 font-semibold">
-                    <CheckCircle2 className="h-4 w-4" />
-                    You joined this club!
+                      </Link>
+                    ))}
                   </div>
-                  <Button variant="secondary" className="w-full" onClick={handleLeave} disabled={joining}>
-                    Leave Club
-                  </Button>
-                </div>
-              ) : (
-                <Button variant="primary" className="w-full" size="lg" onClick={handleJoin} disabled={joining}>
-                  {joining ? (
-                    <span className="flex items-center gap-2">
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      Joining…
-                    </span>
-                  ) : user ? 'Join Club' : 'Sign in to Join'}
-                </Button>
-              )}
-            </div>
+                )}
+              </section>
+            </motion.div>
 
-            {/* Social links */}
-            {(club.website || club.instagram || club.twitter) && (
-              <div className="border-[2px] border-border bg-surface-1 p-5">
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-ink-muted mb-3">Links</p>
-                <div className="flex flex-col gap-2">
-                  {club.website && (
-                    <a href={club.website} target="_blank" rel="noopener noreferrer"
-                      className="flex items-center gap-2 text-sm text-ink-muted hover:text-ink transition-colors">
-                      <Globe className="h-4 w-4" /> Website
-                    </a>
-                  )}
-                  {club.instagram && (
-                    <a href={`https://instagram.com/${club.instagram}`} target="_blank" rel="noopener noreferrer"
-                      className="flex items-center gap-2 text-sm text-ink-muted hover:text-ink transition-colors">
-                      <Globe className="h-4 w-4" /> @{club.instagram}
-                    </a>
-                  )}
-                  {club.twitter && (
-                    <a href={`https://twitter.com/${club.twitter}`} target="_blank" rel="noopener noreferrer"
-                      className="flex items-center gap-2 text-sm text-ink-muted hover:text-ink transition-colors">
-                      <Globe className="h-4 w-4" /> @{club.twitter}
-                    </a>
-                  )}
-                </div>
+            {/* Right sidebar */}
+            <motion.div 
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="flex flex-col gap-6 lg:sticky lg:top-28"
+            >
+              {/* Join/leave */}
+              <div className="bg-surface-2/80 backdrop-blur-xl border border-border/80 rounded-3xl p-8 shadow-soft-lg">
+                <p className="text-[14px] font-bold uppercase tracking-[0.1em] text-ink mb-6 pb-4 border-b border-border/60">
+                  Membership
+                </p>
+
+                {joinError && (
+                  <div className="mb-6 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-[13px] text-red-400 font-medium">
+                    {joinError}
+                  </div>
+                )}
+
+                {joined ? (
+                  <div className="flex flex-col gap-4">
+                    <div className="flex items-center gap-2.5 text-[14px] text-accent-teal font-medium bg-accent-teal/5 px-4 py-3 rounded-xl border border-accent-teal/20">
+                      <CheckCircle2 className="h-5 w-5" />
+                      You are a member!
+                    </div>
+                    <button 
+                      className="w-full bg-surface-1 border border-border/80 text-ink px-4 py-3 rounded-xl font-semibold text-[14px] hover:border-red-500/50 hover:text-red-400 transition-all shadow-sm disabled:opacity-50" 
+                      onClick={handleLeave} 
+                      disabled={joining}
+                    >
+                      Leave Club
+                    </button>
+                  </div>
+                ) : (
+                  <button 
+                    className="w-full bg-ink text-canvas hover:bg-ink/90 px-4 py-3.5 rounded-xl font-bold text-[14px] transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed" 
+                    onClick={handleJoin} 
+                    disabled={joining}
+                  >
+                    {joining ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Joining...
+                      </>
+                    ) : user ? 'Join Club' : 'Sign in to Join'}
+                  </button>
+                )}
               </div>
-            )}
+
+              {/* Social links */}
+              {(club.website || club.instagram || club.twitter) && (
+                <div className="bg-surface-2/80 backdrop-blur-xl border border-border/80 rounded-3xl p-8 shadow-soft">
+                  <p className="text-[14px] font-bold uppercase tracking-[0.1em] text-ink mb-6 pb-4 border-b border-border/60">
+                    Connect
+                  </p>
+                  <div className="flex flex-col gap-4">
+                    {club.website && (
+                      <a href={club.website} target="_blank" rel="noopener noreferrer"
+                        className="flex items-center gap-3 text-[14px] font-medium text-ink-muted hover:text-accent-teal transition-colors">
+                        <div className="w-8 h-8 rounded-full bg-surface-1 border border-border/60 flex items-center justify-center">
+                          <Globe className="h-4 w-4" />
+                        </div>
+                        Website
+                      </a>
+                    )}
+                    {club.instagram && (
+                      <a href={`https://instagram.com/${club.instagram}`} target="_blank" rel="noopener noreferrer"
+                        className="flex items-center gap-3 text-[14px] font-medium text-ink-muted hover:text-accent-pink transition-colors">
+                        <div className="w-8 h-8 rounded-full bg-surface-1 border border-border/60 flex items-center justify-center">
+                          <Instagram className="h-4 w-4" />
+                        </div>
+                        @{club.instagram}
+                      </a>
+                    )}
+                    {club.twitter && (
+                      <a href={`https://twitter.com/${club.twitter}`} target="_blank" rel="noopener noreferrer"
+                        className="flex items-center gap-3 text-[14px] font-medium text-ink-muted hover:text-accent-cyan transition-colors">
+                        <div className="w-8 h-8 rounded-full bg-surface-1 border border-border/60 flex items-center justify-center">
+                          <Twitter className="h-4 w-4" />
+                        </div>
+                        @{club.twitter}
+                      </a>
+                    )}
+                  </div>
+                </div>
+              )}
+            </motion.div>
           </div>
         </div>
       </div>

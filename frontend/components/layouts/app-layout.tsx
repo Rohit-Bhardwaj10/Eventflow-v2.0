@@ -10,10 +10,10 @@ import {
   Users,
   Compass,
   User,
-  Bell,
   LogOut,
   Zap,
 } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const navLinks = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -42,9 +42,9 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-canvas">
-        <div className="flex flex-col items-center gap-4">
-          <div className="h-8 w-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-          <p className="text-caption text-ink-muted">Loading...</p>
+        <div className="relative w-12 h-12">
+          <div className="absolute inset-0 rounded-full border-2 border-border"></div>
+          <div className="absolute inset-0 rounded-full border-2 border-accent-teal border-t-transparent animate-spin"></div>
         </div>
       </div>
     );
@@ -60,24 +60,28 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     .toUpperCase();
 
   return (
-    <div className="min-h-screen flex bg-canvas">
-      {/* Sidebar */}
-      <aside className="w-64 border-r border-border flex flex-col shrink-0">
+    <div className="min-h-screen flex bg-canvas relative overflow-hidden text-ink">
+      {/* Subtle background effects */}
+      <div className="pointer-events-none fixed inset-0 z-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:28px_28px] [mask-image:radial-gradient(ellipse_80%_80%_at_50%_30%,#000_60%,transparent_100%)]" />
+      <div className="fixed top-[-10%] left-[-10%] w-[500px] h-[500px] bg-accent-teal/5 rounded-full blur-[120px] pointer-events-none"></div>
+
+      {/* Glass Sidebar */}
+      <aside className="w-64 flex flex-col shrink-0 relative z-20 m-4 rounded-3xl bg-surface-2/60 backdrop-blur-xl border border-border/60 shadow-soft-lg overflow-hidden">
         {/* Logo */}
-        <div className="h-14 flex items-center px-5 border-b border-border">
-          <Link href="/dashboard" className="flex items-center gap-2.5">
-            <div className="h-7 w-7 bg-primary flex items-center justify-center border border-border">
-              <Zap className="h-4 w-4 text-ink" />
+        <div className="h-20 flex items-center px-6 border-b border-border/40">
+          <Link href="/dashboard" className="flex items-center gap-3">
+            <div className="h-8 w-8 rounded-full bg-accent-teal/10 flex items-center justify-center border border-accent-teal/20 shadow-inner">
+              <Zap className="h-4 w-4 text-accent-teal" />
             </div>
-            <span className="text-sm font-black uppercase tracking-[0.18em] text-ink">
+            <span className="text-[16px] font-playfair font-bold tracking-wide text-ink">
               Eventflow
             </span>
           </Link>
         </div>
 
         {/* Nav */}
-        <nav className="flex-1 px-3 py-5 flex flex-col gap-1">
-          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-ink-muted px-2 mb-3">
+        <nav className="flex-1 px-4 py-6 flex flex-col gap-2">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-ink-muted/70 px-3 mb-4">
             Menu
           </p>
           {navLinks.map(({ href, label, icon: Icon }) => {
@@ -86,43 +90,49 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
               <Link
                 key={href}
                 href={href}
-                className={`flex items-center gap-3 px-3 py-2.5 text-sm font-semibold transition-colors rounded-sm ${
+                className={`flex items-center gap-3 px-4 py-3 text-[14px] font-medium transition-all rounded-xl relative overflow-hidden group ${
                   active
-                    ? 'bg-primary text-ink'
-                    : 'text-ink-muted hover:text-ink hover:bg-surface-1'
+                    ? 'text-ink bg-surface-1/50 border border-border/50 shadow-sm'
+                    : 'text-ink-muted hover:text-ink hover:bg-surface-1/30'
                 }`}
               >
-                <Icon className="h-4 w-4 shrink-0" />
-                {label}
+                {active && (
+                  <motion.div 
+                    layoutId="activeNavTab" 
+                    className="absolute inset-0 bg-accent-teal/5 border border-accent-teal/10 rounded-xl"
+                  />
+                )}
+                <Icon className={`h-4 w-4 shrink-0 relative z-10 transition-colors ${active ? 'text-accent-teal' : 'group-hover:text-ink'}`} />
+                <span className="relative z-10">{label}</span>
               </Link>
             );
           })}
         </nav>
 
-        {/* User */}
-        <div className="p-3 border-t border-border">
+        {/* User Profile */}
+        <div className="p-4 border-t border-border/40 bg-surface-1/20">
           <Link href="/profile">
-            <div className="flex items-center gap-3 px-2 py-2 hover:bg-surface-1 rounded-sm transition-colors cursor-pointer mb-1">
+            <div className="flex items-center gap-3 px-3 py-3 hover:bg-surface-1/50 rounded-xl transition-all cursor-pointer mb-2 border border-transparent hover:border-border/50">
               {user.avatar ? (
                 <img
                   src={user.avatar}
                   alt={user.name}
-                  className="h-8 w-8 rounded-full object-cover border border-border"
+                  className="h-10 w-10 rounded-full object-cover border border-border/60 shadow-sm"
                 />
               ) : (
-                <div className="h-8 w-8 bg-surface-2 border border-border flex items-center justify-center rounded-full">
-                  <span className="text-[10px] font-black text-ink">{initials}</span>
+                <div className="h-10 w-10 bg-surface-2 border border-border/60 flex items-center justify-center rounded-full shadow-sm">
+                  <span className="text-[12px] font-bold text-ink">{initials}</span>
                 </div>
               )}
               <div className="flex flex-col min-w-0">
-                <span className="text-sm font-semibold text-ink truncate">{user.name}</span>
-                <span className="text-[10px] text-ink-muted truncate">{user.email}</span>
+                <span className="text-[14px] font-semibold text-ink truncate">{user.name}</span>
+                <span className="text-[12px] text-ink-muted truncate">{user.email}</span>
               </div>
             </div>
           </Link>
           <button
             onClick={handleLogout}
-            className="flex w-full items-center gap-3 px-2 py-2 text-sm text-ink-muted hover:text-ink hover:bg-surface-1 rounded-sm transition-colors"
+            className="flex w-full items-center gap-3 px-4 py-3 text-[14px] font-medium text-red-400/80 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-all"
           >
             <LogOut className="h-4 w-4" />
             Sign out
@@ -130,21 +140,32 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         </div>
       </aside>
 
-      {/* Main */}
-      <main className="flex-1 flex flex-col min-h-screen overflow-y-auto">
-        <header className="h-14 border-b border-border flex items-center justify-between px-8 shrink-0 sticky top-0 bg-canvas z-10">
-          <div />
-          <div className="flex items-center gap-3">
+      {/* Main Content */}
+      <main className="flex-1 flex flex-col min-h-screen overflow-y-auto relative z-10">
+        <header className="h-20 flex items-center justify-end px-10 shrink-0 sticky top-0 z-30">
+          {/* Subtle gradient behind header */}
+          <div className="absolute inset-0 bg-gradient-to-b from-canvas via-canvas/80 to-transparent pointer-events-none" />
+          
+          <div className="flex items-center gap-4 relative z-10">
             <Link
               href="/profile"
-              className="flex items-center gap-2 text-sm text-ink-muted hover:text-ink transition-colors"
+              className="flex items-center gap-2.5 text-[14px] text-ink-muted hover:text-ink transition-all bg-surface-2/40 backdrop-blur-md border border-border/50 px-4 py-2 rounded-full hover:border-border/80 shadow-sm"
             >
               <User className="h-4 w-4" />
               <span className="font-semibold">{user.name}</span>
             </Link>
           </div>
         </header>
-        <div className="flex-1 p-8">{children}</div>
+        
+        <div className="flex-1 px-10 pb-10">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+          >
+            {children}
+          </motion.div>
+        </div>
       </main>
     </div>
   );
