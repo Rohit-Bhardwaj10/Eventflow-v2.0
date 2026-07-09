@@ -100,7 +100,7 @@ export default function LoginPage() {
               </div>
 
               <Button 
-                variant="default" 
+                variant="primary" 
                 className="mt-4 w-full rounded-xl bg-slate-900 text-white hover:bg-slate-800 shadow-lg shadow-slate-900/20" 
                 size="lg" 
                 disabled={loading}
