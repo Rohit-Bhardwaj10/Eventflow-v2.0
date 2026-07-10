@@ -527,7 +527,7 @@ export default function LandingPage() {
                     <p className="text-[15px] text-ink-muted mt-2 max-w-md">For students, it’s the living pulse of the university. Always know what's happening and where your friends are going.</p>
                    <div className="flex-1 flex flex-col gap-3 mt-8 w-full max-w-sm mx-auto">
                      {/* Event pill 1 */}
-                     <div className="bg-white border border-border/80 shadow-sm p-2.5 sm:p-3 rounded-2xl flex items-center gap-3 sm:gap-4 group-hover:-translate-y-1 transition-transform duration-300">
+                     <div className="bg-white border border-border/80 shadow-sm p-2.5 sm:p-3 rounded-2xl flex items-center gap-3 sm:gap-4">
                         <div className="size-10 sm:size-12 rounded-xl bg-accent-teal/10 flex flex-col items-center justify-center shrink-0">
                           <span className="text-[9px] font-bold text-accent-teal uppercase">Oct</span>
                           <span className="text-sm sm:text-base font-bold text-accent-teal leading-none">24</span>
@@ -538,7 +538,7 @@ export default function LandingPage() {
                         </div>
                      </div>
                      {/* Event pill 2 */}
-                     <div className="bg-white border border-border/80 shadow-sm p-2.5 sm:p-3 rounded-2xl flex items-center gap-3 sm:gap-4 group-hover:-translate-y-1 transition-transform duration-300 delay-75">
+                     <div className="bg-white border border-border/80 shadow-sm p-2.5 sm:p-3 rounded-2xl flex items-center gap-3 sm:gap-4">
                         <div className="size-10 sm:size-12 rounded-xl bg-primary/10 flex flex-col items-center justify-center shrink-0">
                           <span className="text-[9px] font-bold text-primary uppercase">Oct</span>
                           <span className="text-sm sm:text-base font-bold text-primary leading-none">26</span>

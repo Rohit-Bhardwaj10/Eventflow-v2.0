@@ -288,7 +288,7 @@ export class RegistrationsService {
 
     const qrCode = await QRCode.toDataURL(registration.qrToken, { width: 300 });
 
-    return { registration, qrCode };
+    return { ...registration, qrCodeDataUrl: qrCode };
   }
 
   // ────────────────────────────────────────────────

@@ -13,9 +13,7 @@ import {
   Loader2,
   CalendarDays,
   CheckCircle2,
-  MapPin,
-  Instagram,
-  Twitter
+  MapPin
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -318,7 +316,7 @@ export default function ClubDetailPage() {
                       <a href={`https://instagram.com/${club.instagram}`} target="_blank" rel="noopener noreferrer"
                         className="flex items-center gap-3 text-[14px] font-medium text-ink-muted hover:text-accent-pink transition-colors">
                         <div className="w-8 h-8 rounded-full bg-surface-1 border border-border/60 flex items-center justify-center">
-                          <Instagram className="h-4 w-4" />
+                          @
                         </div>
                         @{club.instagram}
                       </a>
@@ -327,7 +325,7 @@ export default function ClubDetailPage() {
                       <a href={`https://twitter.com/${club.twitter}`} target="_blank" rel="noopener noreferrer"
                         className="flex items-center gap-3 text-[14px] font-medium text-ink-muted hover:text-accent-cyan transition-colors">
                         <div className="w-8 h-8 rounded-full bg-surface-1 border border-border/60 flex items-center justify-center">
-                          <Twitter className="h-4 w-4" />
+                          @
                         </div>
                         @{club.twitter}
                       </a>

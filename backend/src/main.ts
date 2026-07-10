@@ -1,4 +1,6 @@
 import 'dotenv/config'; // Must be first — Prisma 7 no longer auto-loads .env
+import * as dns from 'dns';
+dns.setDefaultResultOrder('ipv4first');
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe, Logger } from '@nestjs/common';

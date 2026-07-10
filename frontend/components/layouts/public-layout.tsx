@@ -3,8 +3,10 @@
 import Link from 'next/link';
 import { type ReactNode, useState, useEffect, useRef } from 'react';
 import { Menu, X } from 'lucide-react';
+import { useAuth } from '@/lib/auth-context';
 
 export function PublicLayout({ children, hideFooter = false, hideNav = false }: { children: ReactNode; hideFooter?: boolean; hideNav?: boolean }) {
+  const { user } = useAuth();
   const [scrolled, setScrolled] = useState(false);
   const [visible, setVisible] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -100,17 +102,30 @@ export function PublicLayout({ children, hideFooter = false, hideNav = false }: 
 
             {/* Actions */}
             <div className="flex items-center gap-2 sm:gap-2.5 relative z-10">
-              <Link href="/login" className="hidden sm:block">
-                <button className="rounded-full px-4 py-2 text-[13px] font-medium text-slate-600 transition-all duration-200 hover:bg-black/[0.06] hover:text-slate-900">
-                  Log in
-                </button>
-              </Link>
-              <Link href="/signup">
-                {/* Glass-within-glass CTA pill */}
-                <button className="rounded-full bg-slate-900/85 backdrop-blur-md border border-white/10 px-5 py-2 text-[13px] font-medium text-white shadow-[0_2px_8px_rgba(0,0,0,0.15),inset_0_1px_0_rgba(255,255,255,0.12)] transition-all duration-200 hover:bg-slate-900 hover:scale-[1.03] hover:shadow-[0_4px_16px_rgba(0,0,0,0.2)]">
-                  Start free
-                </button>
-              </Link>
+              {user ? (
+                <Link href="/dashboard" className="hidden sm:block">
+                  <div className="flex items-center gap-2 cursor-pointer bg-white/50 backdrop-blur-sm border border-border/50 pl-3 pr-1 py-1 rounded-full shadow-sm hover:bg-white/80 transition-all">
+                    <span className="text-[13px] font-medium text-slate-700">Dashboard</span>
+                    <div className="w-7 h-7 rounded-full bg-accent-teal text-white flex items-center justify-center text-[11px] font-bold">
+                      {user.name?.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'U'}
+                    </div>
+                  </div>
+                </Link>
+              ) : (
+                <>
+                  <Link href="/login" className="hidden sm:block">
+                    <button className="rounded-full px-4 py-2 text-[13px] font-medium text-slate-600 transition-all duration-200 hover:bg-black/[0.06] hover:text-slate-900">
+                      Log in
+                    </button>
+                  </Link>
+                  <Link href="/signup">
+                    {/* Glass-within-glass CTA pill */}
+                    <button className="rounded-full bg-slate-900/85 backdrop-blur-md border border-white/10 px-5 py-2 text-[13px] font-medium text-white shadow-[0_2px_8px_rgba(0,0,0,0.15),inset_0_1px_0_rgba(255,255,255,0.12)] transition-all duration-200 hover:bg-slate-900 hover:scale-[1.03] hover:shadow-[0_4px_16px_rgba(0,0,0,0.2)]">
+                      Start free
+                    </button>
+                  </Link>
+                </>
+              )}
 
               {/* Mobile Menu Toggle */}
               <button
@@ -142,16 +157,29 @@ export function PublicLayout({ children, hideFooter = false, hideNav = false }: 
                   </Link>
                 ))}
                 <div className="h-px w-full bg-black/[0.06] my-1 mx-1" style={{ width: 'calc(100% - 8px)' }} />
-                <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
-                  <button className="w-full rounded-[14px] px-4 py-3 text-[14px] font-medium text-slate-700 hover:bg-black/[0.05] transition-colors text-left">
-                    Log in
-                  </button>
-                </Link>
-                <Link href="/signup" onClick={() => setMobileMenuOpen(false)}>
-                  <button className="w-full rounded-[14px] bg-slate-900/85 backdrop-blur-md px-4 py-3 text-[14px] font-medium text-white text-left transition-all hover:bg-slate-900">
-                    Start free →
-                  </button>
-                </Link>
+                {user ? (
+                  <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)}>
+                    <button className="w-full rounded-[14px] bg-slate-900/85 backdrop-blur-md px-4 py-3 text-[14px] font-medium text-white text-left transition-all hover:bg-slate-900 flex items-center gap-2 justify-center">
+                      <div className="w-6 h-6 rounded-full bg-accent-teal text-white flex items-center justify-center text-[10px] font-bold">
+                        {user.name?.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'U'}
+                      </div>
+                      Go to Dashboard →
+                    </button>
+                  </Link>
+                ) : (
+                  <>
+                    <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
+                      <button className="w-full rounded-[14px] px-4 py-3 text-[14px] font-medium text-slate-700 hover:bg-black/[0.05] transition-colors text-left">
+                        Log in
+                      </button>
+                    </Link>
+                    <Link href="/signup" onClick={() => setMobileMenuOpen(false)}>
+                      <button className="w-full rounded-[14px] bg-slate-900/85 backdrop-blur-md px-4 py-3 text-[14px] font-medium text-white text-left transition-all hover:bg-slate-900">
+                        Start free →
+                      </button>
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
           </header>

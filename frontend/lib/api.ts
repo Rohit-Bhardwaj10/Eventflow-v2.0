@@ -58,7 +58,13 @@ async function request<T>(
     const refreshed = await tryRefresh();
     if (refreshed) return request<T>(path, options, false);
     clearTokens();
-    if (typeof window !== 'undefined') window.location.href = '/login';
+    if (
+      typeof window !== 'undefined' && 
+      window.location.pathname !== '/login' && 
+      !path.includes('/auth/me')
+    ) {
+      window.location.href = '/login';
+    }
     throw new ApiError(401, 'Session expired');
   }
 

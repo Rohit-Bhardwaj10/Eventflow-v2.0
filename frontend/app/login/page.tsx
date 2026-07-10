@@ -43,7 +43,7 @@ export default function LoginPage() {
     <PublicLayout hideFooter hideNav>
       <div className="flex-1 flex min-h-[calc(100vh-4rem)] md:flex-row-reverse">
         {/* Left Side: Form */}
-        <div className="w-full md:w-1/2 flex items-center justify-center p-8 pt-24 sm:pt-8 lg:p-16 bg-white">
+        <div className="w-full md:w-1/2 flex items-center justify-center p-8 pt-32 sm:pt-16 lg:p-16 bg-white">
           <div className="w-full max-w-md">
             <div className="mb-8">
               <h1 className="font-serif text-4xl lg:text-5xl text-slate-900 mb-2">Welcome Back</h1>

@@ -89,11 +89,13 @@ export class UsersService {
           select: {
             id: true,
             title: true,
+            slug: true,
             startAt: true,
             endAt: true,
             venue: true,
             status: true,
             coverImage: true,
+            club: { select: { name: true } },
           },
         },
         tier: {
