@@ -94,12 +94,9 @@ export default function LandingPage() {
                 className="object-cover"
                 priority
               />
+              {/* Vertical Scanline Texture */}
+              <div className="absolute inset-0 z-10 pointer-events-none bg-[linear-gradient(to_right,rgba(0,0,0,0.15)_1px,transparent_1px)] bg-[size:4px_100%]" />
             </div>
-
-            {/* Top Left Label */}
-            {/* <div className="absolute top-28 left-4 md:left-8 z-10 flex items-center gap-2 text-ink-muted bg-white/40 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/60 shadow-sm">
-              <span className="text-xs font-semibold tracking-wide">✦ EventFlow.</span>
-            </div> */}
 
             {/* Content Stack */}
             <div className="relative z-10 flex flex-col items-center text-center max-w-4xl px-6 w-full">
