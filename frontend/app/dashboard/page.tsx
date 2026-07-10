@@ -103,7 +103,7 @@ export default function DashboardPage() {
           className="relative"
         >
           <div className="absolute -left-6 top-0 bottom-0 w-1 bg-accent-teal rounded-full" />
-          <h1 className="text-[32px] font-playfair font-bold tracking-tight text-ink mb-2">
+          <h1 className="text-[28px] sm:text-[32px] font-playfair font-bold tracking-tight text-ink mb-2">
             Welcome back, {firstName}.
           </h1>
           <p className="text-[16px] font-medium text-ink-muted">
@@ -134,7 +134,7 @@ export default function DashboardPage() {
                   {label}
                 </span>
               </div>
-              <span className="text-[36px] font-playfair font-bold text-ink group-hover:text-accent-teal transition-colors">
+              <span className="text-[28px] sm:text-[36px] font-playfair font-bold text-ink group-hover:text-accent-teal transition-colors">
                 <AnimatedNumber value={value} />
               </span>
             </motion.div>

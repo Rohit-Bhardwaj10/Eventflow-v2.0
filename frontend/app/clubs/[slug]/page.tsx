@@ -121,7 +121,7 @@ export default function ClubDetailPage() {
         {/* Soft Gold/Blue Glow */}
         <div className="fixed top-[5%] right-[10%] w-[500px] h-[500px] bg-accent-gold/5 rounded-full blur-[120px] pointer-events-none"></div>
 
-        <div className="relative z-10 max-w-6xl mx-auto px-6 py-24 w-full">
+        <div className="relative z-10 max-w-6xl mx-auto px-6 pt-24 sm:pt-28 pb-10 w-full">
           <Link href="/explore" className="inline-flex items-center gap-2 text-[13px] font-semibold text-ink-muted hover:text-ink mb-10 transition-colors bg-surface-2/50 border border-border/60 px-4 py-2 rounded-full backdrop-blur-md hover:border-accent-teal/30 shadow-sm">
             <ArrowLeft className="h-4 w-4" />
             Back to Explore

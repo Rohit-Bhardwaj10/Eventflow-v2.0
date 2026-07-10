@@ -76,7 +76,7 @@ export default function ExplorePage() {
         <div className="absolute top-[20%] right-[10%] w-[400px] h-[400px] bg-accent-gold/5 rounded-full blur-[100px] pointer-events-none"></div>
         <div className="absolute top-[40%] left-[5%] w-[300px] h-[300px] bg-accent-teal/5 rounded-full blur-[80px] pointer-events-none"></div>
 
-        <div className="relative z-10 max-w-7xl mx-auto px-6 py-28 w-full flex flex-col">
+        <div className="relative z-10 max-w-7xl mx-auto px-6 pt-24 sm:pt-28 pb-10 w-full flex flex-col">
           {/* Header */}
           <div className="flex flex-col items-center text-center gap-5 mb-16">
             <span className="glass-pill px-3 py-1 font-sans text-[11.5px] font-bold uppercase tracking-[0.15em] text-accent-teal shadow-sm">

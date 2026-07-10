@@ -122,7 +122,7 @@ export function PublicLayout({ children, hideFooter = false, hideNav = false }: 
               </button>
             </div>
 
-            {/* Mobile Dropdown (Liquid Glass) */}
+            {/* Mobile Dropdown */}
             <div
               className={`
                 absolute top-[calc(100%+10px)] left-0 right-0 lg:hidden
@@ -130,9 +130,7 @@ export function PublicLayout({ children, hideFooter = false, hideNav = false }: 
                 ${mobileMenuOpen ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 -translate-y-2 pointer-events-none'}
               `}
             >
-              <div className="flex flex-col gap-1 rounded-[22px] border border-white/25 bg-white/65 p-3 shadow-[0_12px_40px_rgba(0,0,0,0.10),inset_0_1.5px_0_rgba(255,255,255,0.7)] backdrop-blur-[28px] backdrop-saturate-[200%]">
-                {/* Top shimmer */}
-                <div className="pointer-events-none absolute inset-x-0 top-0 h-px rounded-t-[22px] bg-gradient-to-r from-transparent via-white/80 to-transparent" />
+              <div className="flex flex-col gap-1 rounded-[22px] bg-white border border-border/50 shadow-soft p-3">
                 {navLinks.map((link) => (
                   <Link
                     key={link.href}

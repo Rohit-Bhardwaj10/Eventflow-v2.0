@@ -66,13 +66,10 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       <div className="fixed top-[-10%] left-[-10%] w-[500px] h-[500px] bg-accent-teal/5 rounded-full blur-[120px] pointer-events-none"></div>
 
       {/* Glass Sidebar */}
-      <aside className="w-64 flex flex-col shrink-0 relative z-20 m-4 rounded-3xl bg-surface-2/60 backdrop-blur-xl border border-border/60 shadow-soft-lg overflow-hidden">
+      <aside className="hidden lg:flex w-64 flex-col shrink-0 relative z-20 m-4 rounded-3xl bg-surface-2/60 backdrop-blur-xl border border-border/60 shadow-soft-lg overflow-hidden">
         {/* Logo */}
         <div className="h-20 flex items-center px-6 border-b border-border/40">
           <Link href="/dashboard" className="flex items-center gap-3">
-            <div className="h-8 w-8 rounded-full bg-accent-teal/10 flex items-center justify-center border border-accent-teal/20 shadow-inner">
-              <Zap className="h-4 w-4 text-accent-teal" />
-            </div>
             <span className="text-[16px] font-playfair font-bold tracking-wide text-ink">
               Eventflow
             </span>
@@ -90,15 +87,14 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
               <Link
                 key={href}
                 href={href}
-                className={`flex items-center gap-3 px-4 py-3 text-[14px] font-medium transition-all rounded-xl relative overflow-hidden group ${
-                  active
-                    ? 'text-ink bg-surface-1/50 border border-border/50 shadow-sm'
-                    : 'text-ink-muted hover:text-ink hover:bg-surface-1/30'
-                }`}
+                className={`flex items-center gap-3 px-4 py-3 text-[14px] font-medium transition-all rounded-xl relative overflow-hidden group ${active
+                  ? 'text-ink bg-surface-1/50 border border-border/50 shadow-sm'
+                  : 'text-ink-muted hover:text-ink hover:bg-surface-1/30'
+                  }`}
               >
                 {active && (
-                  <motion.div 
-                    layoutId="activeNavTab" 
+                  <motion.div
+                    layoutId="activeNavTab"
                     className="absolute inset-0 bg-accent-teal/5 border border-accent-teal/10 rounded-xl"
                   />
                 )}
@@ -141,11 +137,11 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col min-h-screen overflow-y-auto relative z-10">
-        <header className="h-20 flex items-center justify-end px-10 shrink-0 sticky top-0 z-30">
+      <main className="flex-1 flex flex-col min-h-screen overflow-y-auto relative z-10 pb-[72px] lg:pb-0">
+        <header className="h-20 flex items-center justify-end px-4 md:px-10 shrink-0 sticky top-0 z-30">
           {/* Subtle gradient behind header */}
           <div className="absolute inset-0 bg-gradient-to-b from-canvas via-canvas/80 to-transparent pointer-events-none" />
-          
+
           <div className="flex items-center gap-4 relative z-10">
             <Link
               href="/profile"
@@ -156,8 +152,8 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             </Link>
           </div>
         </header>
-        
-        <div className="flex-1 px-10 pb-10">
+
+        <div className="flex-1 px-4 md:px-10 pb-6 md:pb-10">
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -167,6 +163,19 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           </motion.div>
         </div>
       </main>
+
+      {/* Mobile Bottom Nav */}
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 h-[72px] bg-surface-2/90 backdrop-blur-md border-t border-border/50 flex justify-around items-center px-4 pb-[env(safe-area-inset-bottom)] z-50">
+        {navLinks.map(({ href, label, icon: Icon }) => {
+          const active = pathname === href || pathname.startsWith(href + '/');
+          return (
+            <Link key={href} href={href} className={`flex flex-col items-center justify-center gap-1.5 w-16 h-full transition-colors ${active ? 'text-accent-teal' : 'text-ink-muted hover:text-ink'}`}>
+              <Icon className="h-5 w-5" />
+              <span className="text-[10px] font-medium">{label}</span>
+            </Link>
+          );
+        })}
+      </nav>
     </div>
   );
 }
