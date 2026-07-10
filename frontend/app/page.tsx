@@ -71,225 +71,7 @@ function StaggerItem({ children, className = '' }: { children: React.ReactNode, 
   );
 }
 
-// Animated counter hook
-function useCountUp(target: number, inView: boolean, duration = 1.5) {
-  const [value, setValue] = useState(0);
-  useEffect(() => {
-    if (!inView) return;
-    const controls = animate(0, target, {
-      duration,
-      ease: 'easeOut',
-      onUpdate: (v) => setValue(Math.round(v)),
-    });
-    return controls.stop;
-  }, [inView, target, duration]);
-  return value;
-}
-
-function DashboardMockup() {
-  const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true, margin: '-80px' });
-
-  const members = useCountUp(1248, inView, 1.8);
-  const funds = useCountUp(3420, inView, 2.0);
-  const rsvp1 = useCountUp(340, inView, 1.6);
-  const rsvp2 = useCountUp(120, inView, 1.4);
-  const rsvp3 = useCountUp(85, inView, 1.3);
-
-  // Toast notification state
-  const [toast, setToast] = useState(false);
-  useEffect(() => {
-    if (!inView) return;
-    const t1 = setTimeout(() => setToast(true), 2200);
-    const t2 = setTimeout(() => setToast(false), 5000);
-    return () => { clearTimeout(t1); clearTimeout(t2); };
-  }, [inView]);
-
-  // Fake cursor animation — clicks "New Event" then retreats
-  const [cursorPhase, setCursorPhase] = useState<'idle' | 'moving' | 'clicked' | 'retreating'>('idle');
-  useEffect(() => {
-    if (!inView) return;
-    const phases: Array<[typeof cursorPhase, number]> = [
-      ['moving', 800],
-      ['clicked', 1200],
-      ['retreating', 2000],
-      ['idle', 2400],
-    ];
-    const timers = phases.map(([phase, delay]) =>
-      setTimeout(() => setCursorPhase(phase), delay)
-    );
-    return () => timers.forEach(clearTimeout);
-  }, [inView]);
-
-  return (
-    <div ref={ref} className="relative w-full">
-      {/* Fade overlay */}
-      <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-canvas to-transparent z-10 pointer-events-none rounded-b-[20px]" />
-
-      {/* Toast notification */}
-      <motion.div
-        initial={{ opacity: 0, y: -12, scale: 0.95 }}
-        animate={toast ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: -12, scale: 0.95 }}
-        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-        className="absolute top-14 right-4 z-30 flex items-center gap-3 bg-white border border-border/60 rounded-2xl shadow-soft-lg px-4 py-3 min-w-[220px]"
-      >
-        <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center shrink-0">
-          <Bell className="w-4 h-4 text-green-600" />
-        </div>
-        <div className="flex flex-col">
-          <span className="text-[12px] font-bold text-ink">New RSVP!</span>
-          <span className="text-[11px] text-ink-muted">Jordan Lee joined Fall Rush 2026</span>
-        </div>
-        <div className="w-2 h-2 rounded-full bg-green-500 ml-auto animate-pulse shrink-0" />
-      </motion.div>
-
-      {/* Fake cursor */}
-      <motion.div
-        className="absolute z-30 pointer-events-none"
-        initial={{ right: '18%', top: '18%', opacity: 0 }}
-        animate={{
-          right: cursorPhase === 'moving' || cursorPhase === 'clicked' ? '13%' : '18%',
-          top: cursorPhase === 'moving' || cursorPhase === 'clicked' ? '13%' : '18%',
-          opacity: cursorPhase === 'idle' ? 0 : 1,
-          scale: cursorPhase === 'clicked' ? 0.85 : 1,
-        }}
-        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-      >
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-          <path d="M4 2l12 7-6 1-3 6L4 2z" fill="#0d3b38" stroke="white" strokeWidth="1.2" />
-        </svg>
-      </motion.div>
-
-      <div className="glass-panel rounded-[20px] p-2 md:p-3 shadow-glass border border-white/60">
-        <div className="bg-white rounded-xl overflow-hidden border border-border/60 shadow-inner relative aspect-[4/3] md:aspect-[16/9]">
-          {/* Browser Header */}
-          <div className="absolute top-0 w-full h-12 bg-surface-2/50 flex items-center px-4 gap-4 border-b border-border/40">
-            <div className="flex gap-1.5">
-              <div className="w-3 h-3 rounded-full bg-red-400" />
-              <div className="w-3 h-3 rounded-full bg-amber-400" />
-              <div className="w-3 h-3 rounded-full bg-green-400" />
-            </div>
-            <div className="h-6 flex-1 max-w-sm bg-white rounded-md border border-border/50 hidden sm:block" />
-          </div>
-
-          {/* App Body */}
-          <div className="absolute top-12 bottom-0 w-full flex bg-[#fafafa]">
-            {/* Sidebar */}
-            <div className="w-48 lg:w-56 bg-surface-1 border-r border-border/50 p-4 hidden md:flex flex-col gap-6">
-              <div className="flex items-center gap-2 px-2">
-                <div className="w-7 h-7 rounded-md bg-primary text-white flex items-center justify-center font-bold text-sm shadow-sm">C</div>
-                <span className="font-semibold text-[15px] text-ink">ClubSync</span>
-              </div>
-              <div className="space-y-1">
-                <div className="flex gap-3 items-center px-3 py-2.5 bg-surface-3/50 rounded-lg text-primary shadow-sm border border-border/50">
-                  <LayoutDashboard className="w-4 h-4" />
-                  <span className="text-sm font-medium">Dashboard</span>
-                </div>
-                {[{ icon: Star, label: 'Events' }, { icon: Users, label: 'Members' }, { icon: CreditCard, label: 'Finances' }, { icon: QrCode, label: 'Check-in' }].map(({ icon: Icon, label }) => (
-                  <div key={label} className="flex gap-3 items-center px-3 py-2.5 text-ink-muted rounded-lg">
-                    <Icon className="w-4 h-4" />
-                    <span className="text-sm font-medium">{label}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Main Area */}
-            <div className="flex-1 p-4 sm:p-6 lg:p-8 flex flex-col gap-4 sm:gap-6 overflow-hidden">
-              {/* Top bar */}
-              <div className="flex justify-between items-center">
-                <div>
-                  <h2 className="text-2xl font-semibold text-ink tracking-tight">Overview</h2>
-                  <p className="text-sm text-ink-muted mt-1">Welcome back, Alex. Here's what's happening today.</p>
-                </div>
-                <motion.button
-                  animate={cursorPhase === 'clicked' ? { scale: 0.95, backgroundColor: '#114e4a' } : { scale: 1, backgroundColor: '#0d3b38' }}
-                  transition={{ duration: 0.15 }}
-                  className="text-white px-4 py-2.5 flex items-center gap-2 rounded-full text-[13px] font-medium shadow-soft"
-                >
-                  <span className="text-lg leading-none mt-[-2px]">+</span> New Event
-                </motion.button>
-              </div>
-
-              {/* Stats row — animated counters */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="bg-white border border-border/50 rounded-xl shadow-sm p-5 flex flex-col gap-1">
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-xs font-semibold uppercase tracking-wider text-ink-muted">Total Members</span>
-                    <UsersRound className="w-4 h-4 text-ink-muted" />
-                  </div>
-                  <span className="text-3xl font-bold text-ink tracking-tight">{members.toLocaleString()}</span>
-                  <span className="text-xs font-medium text-green-600 flex items-center gap-1 mt-1 bg-green-50 w-fit px-2 py-0.5 rounded-full">↑ 12% this month</span>
-                </div>
-                <div className="bg-white border border-border/50 rounded-xl shadow-sm p-5 flex flex-col gap-1">
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-xs font-semibold uppercase tracking-wider text-ink-muted">Active Events</span>
-                    <Star className="w-4 h-4 text-ink-muted" />
-                  </div>
-                  <span className="text-3xl font-bold text-ink tracking-tight">4</span>
-                  <span className="text-xs font-medium text-ink-subtle mt-1 flex items-center gap-1 bg-surface-2 w-fit px-2 py-0.5 rounded-full">2 upcoming this week</span>
-                </div>
-                <div className="bg-white border border-border/50 rounded-xl shadow-sm p-5 flex flex-col gap-1">
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-xs font-semibold uppercase tracking-wider text-ink-muted">Funds Collected</span>
-                    <LineChart className="w-4 h-4 text-ink-muted" />
-                  </div>
-                  <span className="text-3xl font-bold text-ink tracking-tight">${funds.toLocaleString()}</span>
-                  <span className="text-xs font-medium text-green-600 flex items-center gap-1 mt-1 bg-green-50 w-fit px-2 py-0.5 rounded-full">↑ $850 this week</span>
-                </div>
-              </div>
-
-              {/* Events list — animated progress bars + counters */}
-              <div className="flex-1 bg-white border border-border/50 rounded-xl shadow-sm p-5 flex flex-col gap-4 overflow-hidden">
-                <div className="flex items-center justify-between border-b border-border/40 pb-3">
-                  <h3 className="font-semibold text-ink text-[15px]">Upcoming Events</h3>
-                  <span className="text-[13px] font-medium text-primary">View all</span>
-                </div>
-                <div className="flex flex-col gap-3 overflow-hidden">
-                  {[
-                    { month: 'Oct', day: 15, name: 'Fall Rush 2026', loc: 'Main Quad • 10:00 AM', rsvp: rsvp1, cap: 500, color: 'accent-teal' },
-                    { month: 'Oct', day: 18, name: 'Hackathon Prep', loc: 'Student Center • 6:00 PM', rsvp: rsvp2, cap: 150, color: 'primary' },
-                    { month: 'Oct', day: 22, name: 'General Body Meeting', loc: 'Room 402 • 7:00 PM', rsvp: rsvp3, cap: 100, color: 'amber' },
-                  ].map(({ month, day, name, loc, rsvp, cap, color }) => {
-                    const pct = Math.round((rsvp / cap) * 100);
-                    const dotColor = color === 'accent-teal' ? 'bg-accent-teal' : color === 'primary' ? 'bg-primary' : 'bg-amber-500';
-                    const barColor = color === 'accent-teal' ? 'bg-accent-teal' : color === 'primary' ? 'bg-primary' : 'bg-amber-500';
-                    const bgColor = color === 'accent-teal' ? 'bg-accent-teal/10 border-accent-teal/20 text-accent-teal' : color === 'primary' ? 'bg-primary/10 border-primary/20 text-primary' : 'bg-amber-500/10 border-amber-500/20 text-amber-600';
-                    return (
-                      <div key={name} className="flex items-center justify-between p-2.5 sm:p-3 rounded-xl border border-border/40 shadow-sm gap-2 sm:gap-4">
-                        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-                          <div className={`w-11 h-11 border rounded-lg flex flex-col items-center justify-center shrink-0 ${bgColor}`}>
-                            <span className="text-[9px] font-bold uppercase tracking-wider leading-none mb-0.5">{month}</span>
-                            <span className="text-base font-bold leading-none">{day}</span>
-                          </div>
-                          <div className="min-w-0">
-                            <p className="text-[14px] font-semibold text-ink truncate">{name}</p>
-                            <p className="text-[12px] text-ink-muted mt-0.5 truncate">{loc}</p>
-                          </div>
-                        </div>
-                        <div className="text-right shrink-0 flex flex-col items-end gap-1.5">
-                          <p className="text-[14px] font-semibold text-ink">{rsvp.toLocaleString()} <span className="text-ink-subtle font-normal">/ {cap}</span></p>
-                          <div className="w-24 h-1.5 bg-surface-2 rounded-full overflow-hidden">
-                            <motion.div
-                              className={`h-full rounded-full ${barColor}`}
-                              initial={{ width: 0 }}
-                              animate={{ width: inView ? `${pct}%` : 0 }}
-                              transition={{ duration: 1.5, ease: 'easeOut', delay: 0.6 }}
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
+import { DashboardMockup, EventCardsMockup, RevenueChartMockup, ScannerMockup, DebateSocietyMockup } from '@/components/landing/mockups';
 
 export default function LandingPage() {
   return (
@@ -599,47 +381,7 @@ export default function LandingPage() {
           <div className="mx-auto flex max-w-[1200px] flex-col items-center gap-12 lg:gap-20 lg:flex-row">
             <FadeIn scale={0.97} delay={0.1} className="w-full lg:w-[560px] lg:shrink-0 rounded-2xl overflow-hidden border border-white/50 shadow-[0_12px_40px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,1)] bg-white/60 backdrop-blur-[24px]">
               <div className="bg-white/40 backdrop-blur-sm p-4 sm:p-6">
-                <div className="relative min-h-[260px] sm:min-h-[300px] bg-white/80 backdrop-blur-md rounded-xl border border-white/60 shadow-inner overflow-hidden flex flex-col">
-                  {/* Mock UI */}
-                  <div className="h-10 border-b border-border/30 bg-white/60 flex items-center px-4 gap-2">
-                    <div className="w-3 h-3 rounded-full bg-red-400"></div>
-                    <div className="w-3 h-3 rounded-full bg-amber-400"></div>
-                    <div className="w-3 h-3 rounded-full bg-green-400"></div>
-                  </div>
-                  <div className="p-3 sm:p-4 flex-1 flex flex-col gap-3 bg-white/40 backdrop-blur-sm overflow-hidden">
-                    {/* Event Card 1 */}
-                    <div className="w-full bg-white/90 rounded-lg border border-white/60 shadow-sm p-2.5 sm:p-3 flex gap-3">
-                      <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-md bg-accent-teal/10 flex items-center justify-center shrink-0">
-                        <span className="text-[10px] font-bold text-accent-teal uppercase text-center leading-tight">Oct<br />24</span>
-                      </div>
-                      <div className="flex flex-col justify-center flex-1">
-                        <span className="text-[12px] sm:text-[13px] font-bold text-ink leading-tight">Fall Rush Bonfire</span>
-                        <span className="text-[10px] sm:text-[11px] text-ink-muted mt-0.5">Greek Council · Main Quad</span>
-                        <div className="flex items-center gap-1 mt-1 sm:mt-2">
-                          <div className="flex -space-x-1">
-                            <div className="w-4 h-4 rounded-full bg-primary/20 border border-white"></div>
-                            <div className="w-4 h-4 rounded-full bg-accent-teal/20 border border-white"></div>
-                            <div className="w-4 h-4 rounded-full bg-accent-gold/20 border border-white"></div>
-                          </div>
-                          <span className="text-[9px] text-ink-muted ml-1">+120 going</span>
-                        </div>
-                      </div>
-                    </div>
-                    {/* Event Card 2 */}
-                    <div className="w-full bg-white/90 rounded-lg border border-white/60 shadow-sm p-2.5 sm:p-3 flex gap-3 opacity-60">
-                      <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-md bg-accent-gold/10 flex items-center justify-center shrink-0">
-                        <span className="text-[10px] font-bold text-accent-gold uppercase text-center leading-tight">Oct<br />26</span>
-                      </div>
-                      <div className="flex flex-col justify-center flex-1">
-                        <span className="text-[12px] sm:text-[13px] font-bold text-ink leading-tight">Tech Resume Review</span>
-                        <span className="text-[10px] sm:text-[11px] text-ink-muted mt-0.5">Computer Science Club</span>
-                        <div className="flex items-center gap-1 mt-1 sm:mt-2">
-                          <span className="text-[9px] text-accent-teal font-medium bg-accent-teal/10 px-1.5 py-0.5 rounded">Free</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+<EventCardsMockup />
               </div>
             </FadeIn>
             <FadeIn delay={0.2} className="flex flex-1 flex-col items-start gap-[18px]">
@@ -657,39 +399,7 @@ export default function LandingPage() {
           <div className="mx-auto flex max-w-[1200px] flex-col items-center gap-12 lg:gap-20 lg:flex-row-reverse">
             <FadeIn scale={0.97} delay={0.1} className="w-full lg:w-[560px] lg:shrink-0 rounded-2xl overflow-hidden border border-border shadow-soft">
               <div className="bg-surface-2 p-6">
-                <div className="relative h-[260px] sm:h-[300px] bg-primary rounded-xl border border-primary-hover shadow-inner overflow-hidden flex flex-col p-6">
-                  {/* Mock UI */}
-                  <div className="flex items-start justify-between mb-2">
-                    <div className="flex flex-col">
-                      <span className="text-white/80 text-sm font-medium">Net Revenue</span>
-                      <span className="text-white text-3xl font-playfair tracking-tight mt-1">$4,250.00</span>
-                    </div>
-                    <span className="bg-green-500/20 text-green-400 text-[11px] font-bold px-2 py-1 rounded-md flex items-center gap-1">
-                      +12.5%
-                    </span>
-                  </div>
-                  <div className="flex-1 border-b border-l border-white/20 relative mt-4">
-                    {/* Fake Graph */}
-                    <div className="absolute bottom-0 w-full h-[60%] bg-accent-teal/20" style={{ clipPath: 'polygon(0 100%, 0 60%, 20% 50%, 40% 70%, 60% 40%, 80% 60%, 100% 20%, 100% 100%)' }}></div>
-                    <div className="absolute bottom-0 w-full h-[60%] border-t-2 border-accent-teal" style={{ clipPath: 'polygon(0 61%, 20% 51%, 40% 71%, 60% 41%, 80% 61%, 100% 21%, 100% 100%)' }}></div>
-                  </div>
-                  <div className="flex flex-col gap-2 mt-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center"><span className="text-white text-[10px]">JD</span></div>
-                        <span className="text-white/90 text-[12px]">John Doe</span>
-                      </div>
-                      <span className="text-white font-medium text-[12px]">+ $15.00</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center"><span className="text-white text-[10px]">AS</span></div>
-                        <span className="text-white/90 text-[12px]">Alice Smith</span>
-                      </div>
-                      <span className="text-white font-medium text-[12px]">+ $15.00</span>
-                    </div>
-                  </div>
-                </div>
+<RevenueChartMockup />
               </div>
             </FadeIn>
             <FadeIn delay={0.2} className="flex flex-1 flex-col items-start gap-[18px]">
@@ -707,38 +417,7 @@ export default function LandingPage() {
           <div className="mx-auto flex max-w-[1200px] flex-col items-center gap-12 lg:gap-20 lg:flex-row">
             <FadeIn scale={0.97} delay={0.1} className="w-full lg:w-[560px] lg:shrink-0 rounded-2xl overflow-hidden border border-white/50 shadow-[0_12px_40px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,1)] bg-white/60 backdrop-blur-[24px]">
               <div className="bg-white/40 backdrop-blur-sm p-6">
-                <div className="relative h-[260px] sm:h-[300px] bg-[#0A1A17] rounded-xl border border-white/20 shadow-inner overflow-hidden flex flex-col items-center justify-center p-6">
-                  {/* Mock UI: Scanner */}
-                  <div className="absolute top-4 left-4 right-4 flex justify-between items-center">
-                    <span className="text-white/70 text-xs font-medium">Scanner Active</span>
-                    <span className="bg-green-500/20 text-green-400 text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1">
-                      <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
-                      142 / 200
-                    </span>
-                  </div>
-
-                  {/* Viewfinder */}
-                  <div className="relative w-40 h-40 mt-4">
-                    <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-accent-teal"></div>
-                    <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-accent-teal"></div>
-                    <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-accent-teal"></div>
-                    <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-accent-teal"></div>
-
-                    {/* Scanning Line */}
-                    <div className="absolute top-1/2 left-0 w-full h-[2px] bg-accent-teal shadow-[0_0_10px_#27E0C0] animate-[scan_2s_ease-in-out_infinite] opacity-80" style={{ transform: 'translateY(-50%)' }}></div>
-                  </div>
-
-                  {/* Success Toast */}
-                  <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-4 py-2 flex items-center gap-3">
-                    <div className="w-6 h-6 rounded-full bg-green-500/20 flex items-center justify-center">
-                      <svg className="w-3.5 h-3.5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-white text-[12px] font-semibold leading-tight">Sarah Jenkins</span>
-                      <span className="text-white/60 text-[10px]">VIP Ticket</span>
-                    </div>
-                  </div>
-                </div>
+<ScannerMockup />
               </div>
             </FadeIn>
             <FadeIn delay={0.2} className="flex flex-1 flex-col items-start gap-[18px]">
@@ -756,41 +435,7 @@ export default function LandingPage() {
           <div className="mx-auto flex max-w-[1200px] flex-col items-center gap-12 lg:gap-20 lg:flex-row-reverse">
             <FadeIn scale={0.97} delay={0.1} className="w-full lg:w-[560px] lg:shrink-0 rounded-2xl overflow-hidden border border-border shadow-soft">
               <div className="bg-surface-2 p-6">
-                <div className="relative h-[260px] sm:h-[300px] bg-white rounded-xl border border-border shadow-inner overflow-hidden flex flex-col">
-                  {/* Mock UI: Club Profile */}
-                  <div className="h-28 w-full bg-gradient-to-r from-accent-teal/20 to-primary/20 relative">
-                    <div className="absolute -bottom-8 left-6 w-16 h-16 rounded-xl bg-white border border-border shadow-sm flex items-center justify-center">
-                      <span className="text-primary font-playfair font-bold text-2xl">D</span>
-                    </div>
-                  </div>
-                  <div className="pt-10 px-6 pb-4">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h4 className="text-lg font-bold text-ink leading-tight">Debate Society</h4>
-                        <span className="text-[11px] text-ink-muted">@debatesociety · 450 Followers</span>
-                      </div>
-                      <span className="bg-primary text-white text-[10px] font-medium px-3 py-1.5 rounded-full">Follow</span>
-                    </div>
-
-                    {/* Tabs */}
-                    <div className="flex gap-4 mt-6 border-b border-border">
-                      <span className="text-[12px] font-semibold text-primary border-b-2 border-primary pb-2">Upcoming Events</span>
-                      <span className="text-[12px] font-medium text-ink-muted pb-2">Announcements</span>
-                    </div>
-
-                    {/* Event Snippet */}
-                    <div className="mt-4 flex gap-3 items-center">
-                      <div className="w-12 h-12 rounded-lg bg-surface-2 flex flex-col items-center justify-center border border-border">
-                        <span className="text-[9px] uppercase font-bold text-accent-teal">Nov</span>
-                        <span className="text-[14px] font-bold text-ink leading-tight">12</span>
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-[13px] font-bold text-ink">Fall Intercollegiate Debate</span>
-                        <span className="text-[11px] text-ink-muted">Student Union · 6:00 PM</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+<DebateSocietyMockup />
               </div>
             </FadeIn>
             <FadeIn delay={0.2} className="flex flex-1 flex-col items-start gap-[18px]">
